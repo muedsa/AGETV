@@ -119,7 +119,6 @@ fun AnimeDetailScreen(
             val animeDetail = animeDetailLD.data!!
             val info = animeDetail.video
 
-            var expanded by remember { mutableStateOf(false) }
             var selectedPlaySource by remember { mutableStateOf(info.playLists.keys.first()) }
             var selectedPlaySourceList by remember { mutableStateOf(info.playLists[selectedPlaySource]!!) }
 
