@@ -27,4 +27,4 @@ jobs:
         with:
           name: build-artifact
           path: |
-            app\build\outputs\apk
+            app\build\outputs\apk\debug\
