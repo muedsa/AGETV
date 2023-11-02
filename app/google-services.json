@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "168169357854",
+    "project_id": "age-tv",
+    "storage_bucket": "age-tv.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:168169357854:android:00cec6ba987ab3dec5640f",
+        "android_client_info": {
+          "package_name": "com.muedsa.agetv"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAu3XDcUvbr9bkbmKF_2g405e22C5mYn3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:168169357854:android:d6199b7a1efff27fc5640f",
+        "android_client_info": {
+          "package_name": "com.muedsa.agetv.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAu3XDcUvbr9bkbmKF_2g405e22C5mYn3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
