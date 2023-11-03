@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Whatshot
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +50,7 @@ import com.muedsa.compose.tv.widget.EmptyDataScreen
 import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.ErrorScreen
 import com.muedsa.compose.tv.widget.ExposedDropdownMenuButton
+import com.muedsa.compose.tv.widget.FocusScaleSwitch
 import com.muedsa.compose.tv.widget.LoadingScreen
 import com.muedsa.compose.tv.widget.ScreenBackground
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
@@ -60,7 +60,6 @@ import com.muedsa.uitl.LogUtil
 
 @OptIn(
     ExperimentalTvMaterial3Api::class,
-    ExperimentalMaterial3Api::class,
     ExperimentalLayoutApi::class
 )
 @Composable
@@ -121,6 +120,8 @@ fun AnimeDetailScreen(
 
             var selectedPlaySource by remember { mutableStateOf(info.playLists.keys.first()) }
             var selectedPlaySourceList by remember { mutableStateOf(info.playLists[selectedPlaySource]!!) }
+
+            var enabledDanmaku by remember { mutableStateOf(true) }
 
             LaunchedEffect(key1 = animeDetailLD) {
                 if (selectedPlaySource != info.playLists.keys.first()) {
@@ -249,9 +250,23 @@ fun AnimeDetailScreen(
                             }
                         )
 
+                        if (danAnimeInfo.type == LazyType.SUCCESS && danAnimeInfo.data != null) {
+                            Spacer(modifier = Modifier.width(25.dp))
+                            Text(
+                                text = "弹幕",
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            FocusScaleSwitch(
+                                checked = enabledDanmaku,
+                                onCheckedChange = { enabledDanmaku = it }
+                            )
+                        }
+
                         // 弹弹Play数据
                         if (danSearchAnimeListLD.type == LazyType.SUCCESS && !danSearchAnimeListLD.data.isNullOrEmpty()) {
-                            Spacer(modifier = Modifier.width(15.dp))
+                            Spacer(modifier = Modifier.width(25.dp))
                             Text(
                                 text = "匹配弹弹Play",
                                 color = MaterialTheme.colorScheme.onBackground,

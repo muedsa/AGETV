@@ -88,7 +88,7 @@ fun RecommendScreen(
                 itemsIndexed(
                     items = recommendList,
                     key = { _, item -> item.aid }
-                ) { index, item ->
+                ) { _, item ->
                     ImageContentCard(
                         modifier = Modifier.padding(end = ImageCardRowCardPadding),
                         url = item.picSmall,
