@@ -4,6 +4,7 @@ import com.google.common.net.HttpHeaders
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.muedsa.agetv.AgeMobileUrl
 import com.muedsa.agetv.AgeMobileUrlBase64
+import com.muedsa.agetv.BuildConfig
 import com.muedsa.agetv.model.AgePlayInfoModel
 import com.muedsa.uitl.ChromeUserAgent
 import com.muedsa.uitl.LenientJson
@@ -14,6 +15,8 @@ import com.muedsa.uitl.md5
 import kotlinx.serialization.encodeToString
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
@@ -64,6 +67,7 @@ class AgePlayerService {
             val encryptReq = LenientJson.encodeToString(req)
                 .encryptAES128CBCPKCS7(WASM_AES_KEY, WASM_AES_KEY)
                 .toHexString(HexFormat.UpperCase)
+            LogUtil.fb("api baseUrl: $baseUrl")
             val resp = getVipApiService(baseUrl).api(
                 params = encryptReq,
                 uuid = uuid,
@@ -145,6 +149,19 @@ class AgePlayerService {
             val retrofit = Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(LenientJson.asConverterFactory("image/vnd.microsoft.icon".toMediaType()))
+                .client(OkHttpClient.Builder().addInterceptor {
+                    it.proceed(
+                        it.request().newBuilder()
+                            .header(HttpHeaders.USER_AGENT, ChromeUserAgent)
+                            .header(HttpHeaders.REFERER, AgeMobileUrl).build()
+                    )
+                }.also {
+                    if (BuildConfig.DEBUG) {
+                        val loggingInterceptor = HttpLoggingInterceptor()
+                        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+                        it.addInterceptor(loggingInterceptor)
+                    }
+                }.build())
                 .build()
             retrofit.create(AgeVipPlayerApiService::class.java)
         }
@@ -156,6 +173,19 @@ class AgePlayerService {
             DEFAULT_RETROFIT = Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .addConverterFactory(LenientJson.asConverterFactory("image/vnd.microsoft.icon".toMediaType()))
+                .client(OkHttpClient.Builder().addInterceptor {
+                    it.proceed(
+                        it.request().newBuilder()
+                            .header(HttpHeaders.USER_AGENT, ChromeUserAgent)
+                            .header(HttpHeaders.REFERER, AgeMobileUrl).build()
+                    )
+                }.also {
+                    if (BuildConfig.DEBUG) {
+                        val loggingInterceptor = HttpLoggingInterceptor()
+                        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+                        it.addInterceptor(loggingInterceptor)
+                    }
+                }.build())
                 .build()
             DEFAULT_VIP_API_SERVICE = DEFAULT_RETROFIT!!.create(AgeVipPlayerApiService::class.java)
         }

@@ -12,7 +12,7 @@ import retrofit2.http.POST
 
 interface AgeVipPlayerApiService {
 
-    @POST("vip/Api.php")
+    @POST("Api.php")
     @FormUrlEncoded
     @Headers(
         "${HttpHeaders.X_REQUESTED_WITH}: XMLHttpRequest",

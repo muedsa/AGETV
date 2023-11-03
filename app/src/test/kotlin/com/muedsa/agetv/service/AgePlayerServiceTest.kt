@@ -30,7 +30,7 @@ class AgePlayerServiceTest {
             if (playInfo.vUrl.isEmpty()) {
                 throw AgeParseException("vurl is empty")
             }
-            val playUrl = service.decryptPlayUrl(playInfo, "https://43.240.74.134:8443/vip")
+            val playUrl = service.decryptPlayUrl(playInfo, "https://43.240.74.134:8443/vip/")
             println(playUrl)
         }
     }
