@@ -101,7 +101,7 @@ fun CatalogScreen(
         mutableStateOf(false)
     }
 
-    LaunchedEffect(key1 = searchAnimeLPState.type, key2 = searchAnimeLPState.error) {
+    LaunchedEffect(key1 = searchAnimeLPState) {
         if (searchAnimeLPState.type == LazyType.FAILURE) {
             errorMsgBoxState.error(searchAnimeLPState.error)
         }

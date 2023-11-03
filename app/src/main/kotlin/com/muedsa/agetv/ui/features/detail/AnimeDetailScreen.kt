@@ -89,7 +89,7 @@ fun AnimeDetailScreen(
         } else if (animeDetailLD.type == LazyType.SUCCESS) {
             if (animeDetailLD.data != null) {
                 backgroundState.url = animeDetailLD.data!!.video.cover
-                viewModel.danDanPlaySearchAnime()
+                viewModel.searchDanAnime()
             }
         }
     }

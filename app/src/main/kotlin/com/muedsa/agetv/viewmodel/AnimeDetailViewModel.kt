@@ -98,7 +98,7 @@ class AnimeDetailViewModel @Inject constructor(
 
     }
 
-    fun danDanPlaySearchAnime() {
+    fun searchDanAnime() {
         if (animeDetailLDState.value.type == LazyType.SUCCESS
             || animeDetailLDState.value.data != null
         ) {

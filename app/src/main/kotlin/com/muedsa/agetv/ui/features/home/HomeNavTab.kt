@@ -25,6 +25,7 @@ import androidx.tv.material3.TabRowDefaults
 import androidx.tv.material3.Text
 import com.muedsa.agetv.ui.features.home.catalog.CatalogScreen
 import com.muedsa.agetv.ui.features.home.main.MainScreen
+import com.muedsa.agetv.ui.features.home.rank.RankScreen
 import com.muedsa.agetv.ui.features.home.search.SearchScreen
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.HomePageViewModel
@@ -37,6 +38,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 val tabs = listOf(
     HomeNavTabs.Main,
+    HomeNavTabs.Rank,
     HomeNavTabs.Search,
     HomeNavTabs.Catalog
 )
@@ -133,13 +135,18 @@ fun HomeContent(
             onNavigate = onNavigate
         )
 
-        1 -> SearchScreen(
+        1 -> RankScreen(
+            errorMsgBoxState = errorMsgBoxState,
+            onNavigate = onNavigate
+        )
+
+        2 -> SearchScreen(
             backgroundState = backgroundState,
             errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate
         )
 
-        2 -> CatalogScreen(
+        3 -> CatalogScreen(
             backgroundState = backgroundState,
             errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate

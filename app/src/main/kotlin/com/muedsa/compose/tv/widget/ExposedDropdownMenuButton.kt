@@ -12,11 +12,9 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
@@ -33,13 +31,11 @@ import androidx.tv.material3.Text
 @Composable
 fun <T> ExposedDropdownMenuButton(
     expandedState: MutableState<Boolean> = remember { mutableStateOf(false) },
+    selectedIndexState: MutableState<Int> = remember { mutableIntStateOf(0) },
     itemList: List<T>,
     textFn: (Int, T) -> String,
     onSelected: (Int, T) -> Unit = { _, _ -> }
 ) {
-
-    var selectedIndex by remember { mutableIntStateOf(0) }
-
     ExposedDropdownMenuBox(
         expanded = expandedState.value,
         onExpandedChange = { expandedState.value = !expandedState.value },
@@ -96,7 +92,7 @@ fun <T> ExposedDropdownMenuButton(
             contentPadding = OutlinedButtonDefaults.ButtonWithIconContentPadding
         ) {
             Text(
-                text = textFn(selectedIndex, itemList[selectedIndex])
+                text = textFn(selectedIndexState.value, itemList[selectedIndexState.value])
             )
             Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
             Icon(
@@ -117,9 +113,9 @@ fun <T> ExposedDropdownMenuButton(
                         )
                     },
                     onClick = {
-                        selectedIndex = index
+                        selectedIndexState.value = index
                         expandedState.value = false
-                        onSelected(selectedIndex, item)
+                        onSelected(selectedIndexState.value, item)
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                 )
