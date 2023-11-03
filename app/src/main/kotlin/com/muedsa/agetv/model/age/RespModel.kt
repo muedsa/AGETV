@@ -10,5 +10,5 @@ data class RespModel<E>(
     @SerialName("message")
     val message: String?,
     @SerialName("data")
-    val data: E?
+    val data: E? = null
 )
