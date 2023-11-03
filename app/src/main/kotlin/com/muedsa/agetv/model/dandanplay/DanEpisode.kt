@@ -9,5 +9,5 @@ data class DanEpisode(
     @SerialName("episodeTitle") val episodeTitle: String,
     @SerialName("episodeNumber") val episodeNumber: String,
     @SerialName("lastWatched") val lastWatched: String? = null,
-    @SerialName("airDate") val airDate: String
+    @SerialName("airDate") val airDate: String? = null,
 )
