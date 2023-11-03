@@ -27,6 +27,7 @@ import com.muedsa.agetv.ui.features.home.catalog.CatalogScreen
 import com.muedsa.agetv.ui.features.home.latest.LatestUpdateScreen
 import com.muedsa.agetv.ui.features.home.main.MainScreen
 import com.muedsa.agetv.ui.features.home.rank.RankScreen
+import com.muedsa.agetv.ui.features.home.recommend.RecommendScreen
 import com.muedsa.agetv.ui.features.home.search.SearchScreen
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.HomePageViewModel
@@ -41,6 +42,7 @@ val tabs = listOf(
     HomeNavTabs.Main,
     HomeNavTabs.Rank,
     HomeNavTabs.Latest,
+    HomeNavTabs.Recommend,
     HomeNavTabs.Search,
     HomeNavTabs.Catalog
 )
@@ -148,13 +150,19 @@ fun HomeContent(
             onNavigate = onNavigate
         )
 
-        3 -> SearchScreen(
+        3 -> RecommendScreen(
             backgroundState = backgroundState,
             errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate
         )
 
-        4 -> CatalogScreen(
+        4 -> SearchScreen(
+            backgroundState = backgroundState,
+            errorMsgBoxState = errorMsgBoxState,
+            onNavigate = onNavigate
+        )
+
+        5 -> CatalogScreen(
             backgroundState = backgroundState,
             errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate
