@@ -75,6 +75,9 @@ fun RankScreen(
             )
         }
         if (rankLD.type == LazyType.SUCCESS && !rankLD.data.isNullOrEmpty() && rankLD.data!!.size > 2) {
+            val dayList = rankLD.data!![0]
+            val weekList = rankLD.data!![1]
+            val totalList = rankLD.data!![2]
             Row {
                 Column(
                     modifier = Modifier
@@ -89,7 +92,7 @@ fun RankScreen(
                         style = MaterialTheme.typography.titleLarge
                     )
                     TvLazyColumn {
-                        items(rankLD.data!![0]) {
+                        items(dayList) {
                             RankAnimeWidget(
                                 model = it,
                                 onClick = {
@@ -117,7 +120,7 @@ fun RankScreen(
                         style = MaterialTheme.typography.titleLarge
                     )
                     TvLazyColumn {
-                        items(rankLD.data!![1]) {
+                        items(weekList) {
                             RankAnimeWidget(
                                 model = it,
                                 onClick = {
@@ -146,7 +149,7 @@ fun RankScreen(
                     )
 
                     TvLazyColumn {
-                        items(rankLD.data!![2]) {
+                        items(totalList) {
                             RankAnimeWidget(
                                 model = it,
                                 onClick = {
@@ -161,12 +164,12 @@ fun RankScreen(
                     }
                 }
             }
-        } else if (rankLD.type != LazyType.LOADING) {
+        } else if (rankLD.type == LazyType.LOADING) {
+            LoadingScreen()
+        } else {
             ErrorScreen {
                 viewModel.fetchRank()
             }
-        } else {
-            LoadingScreen()
         }
     }
 

@@ -24,6 +24,7 @@ class RankViewModel @Inject constructor(
     val rankLDState = mutableStateOf<LazyData<List<List<RankAnimeModel>>>>(LazyData.init())
 
     fun fetchRank() {
+        rankLDState.value = LazyData.init()
         viewModelScope.launch(context = Dispatchers.IO) {
             try {
                 rankLDState.value =

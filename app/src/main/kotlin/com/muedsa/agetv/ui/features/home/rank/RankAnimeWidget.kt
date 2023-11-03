@@ -34,7 +34,7 @@ fun RankAnimeWidget(
                     .weight(1f)
                     .padding(8.dp)
                     .wrapContentWidth(Alignment.Start),
-                text = model.title,
+                text = "${model.no}. ${model.title}",
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
                 color = MaterialTheme.colorScheme.onBackground,
