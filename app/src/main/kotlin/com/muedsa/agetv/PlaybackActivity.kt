@@ -20,7 +20,10 @@ class PlaybackActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val aid = intent.getIntExtra(AID_KEY, 0)
+        val episodeTitle = intent.getStringExtra(EPISODE_TITLE_KEY)
         val mediaUrl = intent.getStringExtra(MEDIA_URL_KEY)
+        val episodeId = intent.getLongExtra(DAN_EPISODE_ID_KEY, 0)
         setContent {
             TvTheme {
                 // A surface container using the 'background' color from the theme
@@ -28,18 +31,25 @@ class PlaybackActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (mediaUrl.isNullOrEmpty()) {
+                    if (aid <= 0 || episodeTitle.isNullOrEmpty() || mediaUrl.isNullOrEmpty()) {
                         FillTextScreen(context = "视频地址错误")
                     } else {
-                        PlaybackScreen(mediaUrl = mediaUrl)
+                        PlaybackScreen(
+                            aid = aid,
+                            episodeTitle = episodeTitle,
+                            mediaUrl = mediaUrl,
+                            danEpisodeId = episodeId
+                        )
                     }
-
                 }
             }
         }
     }
 
     companion object {
+        const val AID_KEY = "AID"
+        const val EPISODE_TITLE_KEY = "EPISODE_TITLE"
         const val MEDIA_URL_KEY = "MEDIA_URL"
+        const val DAN_EPISODE_ID_KEY = "EPISODE_ID"
     }
 }

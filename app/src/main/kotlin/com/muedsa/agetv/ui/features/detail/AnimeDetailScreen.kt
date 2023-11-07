@@ -3,6 +3,7 @@ package com.muedsa.agetv.ui.features.detail
 import android.content.Intent
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
@@ -76,7 +77,7 @@ fun AnimeDetailScreen(
     val commentsLP by remember { viewModel.commentsLPState }
 
     val danSearchAnimeListLD by remember { viewModel.danSearchAnimeListLDState }
-    val danAnimeInfo by remember { viewModel.danAnimeInfoLDState }
+    val danAnimeInfoLD by remember { viewModel.danAnimeInfoLDState }
 
     val backgroundState = rememberScreenBackgroundState(
         initType = ScreenBackgroundType.SCRIM
@@ -105,9 +106,9 @@ fun AnimeDetailScreen(
         }
     }
 
-    LaunchedEffect(key1 = danAnimeInfo) {
-        if (danAnimeInfo.type == LazyType.FAILURE) {
-            errorMsgBoxState.error(danAnimeInfo.error)
+    LaunchedEffect(key1 = danAnimeInfoLD) {
+        if (danAnimeInfoLD.type == LazyType.FAILURE) {
+            errorMsgBoxState.error(danAnimeInfoLD.error)
         }
     }
 
@@ -206,7 +207,7 @@ fun AnimeDetailScreen(
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.labelLarge
                         )
-                        if (danAnimeInfo.type == LazyType.SUCCESS && danAnimeInfo.data != null) {
+                        if (danAnimeInfoLD.type == LazyType.SUCCESS && danAnimeInfoLD.data != null) {
                             Icon(
                                 imageVector = Icons.Filled.Star,
                                 contentDescription = "评分",
@@ -216,7 +217,7 @@ fun AnimeDetailScreen(
                                 modifier = Modifier
                                     .width(70.dp)
                                     .padding(start = 8.dp, end = 15.dp),
-                                text = "${danAnimeInfo.data!!.rating}",
+                                text = "${danAnimeInfoLD.data!!.rating}",
                                 color = RankFontColor,
                                 style = MaterialTheme.typography.labelLarge
                             )
@@ -250,7 +251,8 @@ fun AnimeDetailScreen(
                             }
                         )
 
-                        if (danAnimeInfo.type == LazyType.SUCCESS && danAnimeInfo.data != null) {
+                        // 开启弹幕按钮
+                        if (danAnimeInfoLD.type == LazyType.SUCCESS && danAnimeInfoLD.data != null) {
                             Spacer(modifier = Modifier.width(25.dp))
                             Text(
                                 text = "弹幕",
@@ -290,15 +292,15 @@ fun AnimeDetailScreen(
                         modifier = Modifier.fillMaxWidth(0.9f),
                         verticalArrangement = Arrangement.Center,
                     ) {
-                        selectedPlaySourceList.forEach {
+                        selectedPlaySourceList.forEachIndexed { index, item ->
                             AssistChip(
                                 modifier = Modifier.padding(end = 8.dp, bottom = 8.dp),
                                 onClick = {
-                                    LogUtil.fb("click play: $it")
+                                    LogUtil.fb("click play: $item")
                                     val url = if (animeDetail.isVip(selectedPlaySource)) {
-                                        "${animeDetail.playerJx["vip"]}${it[1]}"
+                                        "${animeDetail.playerJx["vip"]}${item[1]}"
                                     } else {
-                                        "${animeDetail.playerJx["zj"]}${it[1]}"
+                                        "${animeDetail.playerJx["zj"]}${item[1]}"
                                     }
                                     LogUtil.fb("click playPage: $url")
                                     viewModel.parsePlayInfo(
@@ -308,9 +310,28 @@ fun AnimeDetailScreen(
                                             val intent =
                                                 Intent(context, PlaybackActivity::class.java)
                                             intent.putExtra(
+                                                PlaybackActivity.AID_KEY,
+                                                animeDetail.video.id
+                                            )
+                                            intent.putExtra(
+                                                PlaybackActivity.EPISODE_TITLE_KEY,
+                                                item[0]
+                                            )
+                                            intent.putExtra(
                                                 PlaybackActivity.MEDIA_URL_KEY,
                                                 it.realUrl
                                             )
+                                            if (enabledDanmaku
+                                                && danAnimeInfoLD.type == LazyType.SUCCESS
+                                                && danAnimeInfoLD.data != null
+                                                && !danAnimeInfoLD.data?.episodes.isNullOrEmpty()
+                                                && danAnimeInfoLD.data?.episodes!!.size > index
+                                            ) {
+                                                intent.putExtra(
+                                                    PlaybackActivity.DAN_EPISODE_ID_KEY,
+                                                    danAnimeInfoLD.data?.episodes!![index].episodeId
+                                                )
+                                            }
                                             context.startActivity(intent)
                                         },
                                         onError = {
@@ -319,7 +340,22 @@ fun AnimeDetailScreen(
                                     )
                                 }
                             ) {
-                                Text(text = it[0])
+                                if (enabledDanmaku
+                                    && danAnimeInfoLD.type == LazyType.SUCCESS
+                                    && danAnimeInfoLD.data != null
+                                    && !danAnimeInfoLD.data?.episodes.isNullOrEmpty()
+                                    && danAnimeInfoLD.data?.episodes!!.size > index
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text(text = item[0])
+                                        Text(
+                                            text = danAnimeInfoLD.data!!.episodes[index].episodeTitle,
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
+                                } else {
+                                    Text(text = item[0])
+                                }
                             }
                         }
                     }
