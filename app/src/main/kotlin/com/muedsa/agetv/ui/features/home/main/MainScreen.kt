@@ -160,7 +160,10 @@ fun MainScreen(
 
                 // 每周放送
                 item {
-                    WeekAnimeListWidget(model = weekList)
+                    WeekAnimeListWidget(model = weekList) { _, _, item ->
+                        LogUtil.d("Click $item")
+                        onNavigate(NavigationItems.Detail, listOf(item.id.toString()))
+                    }
                 }
 
                 // bottom space
