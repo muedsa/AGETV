@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ExperimentalTvMaterial3Api
@@ -25,9 +24,9 @@ import com.muedsa.agetv.model.age.AgeCatalogOption
 @Composable
 fun CatalogOptionsWidget(
     title: String,
-    state: MutableState<AgeCatalogOption>,
+    selectedIndex: Int,
     options: List<AgeCatalogOption>,
-    onChange: () -> Unit = {}
+    onClick: (Int, AgeCatalogOption) -> Unit = { _, _ -> }
 ) {
     Text(
         text = title,
@@ -36,11 +35,11 @@ fun CatalogOptionsWidget(
     )
     Spacer(modifier = Modifier.height(4.dp))
     FlowRow {
-        for (option in options) {
+        options.forEachIndexed { index, option ->
             FilterChip(
                 modifier = Modifier.padding(8.dp),
-                selected = option == state.value,
-                leadingIcon = if (option == state.value) {
+                selected = index == selectedIndex,
+                leadingIcon = if (index == selectedIndex) {
                     {
                         Icon(
                             modifier = Modifier.size(FilterChipDefaults.IconSize),
@@ -50,12 +49,7 @@ fun CatalogOptionsWidget(
                     }
                 } else null,
                 onClick = {
-                    state.value = if (option == state.value) {
-                        AgeCatalogOption.Order[0]
-                    } else {
-                        option
-                    }
-                    onChange()
+                    onClick(index, option)
                 }
             ) {
                 Text(text = option.text)

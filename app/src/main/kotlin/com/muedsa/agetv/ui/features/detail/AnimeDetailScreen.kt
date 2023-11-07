@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +59,7 @@ import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.compose.tv.widget.StandardImageCardsRow
 import com.muedsa.compose.tv.widget.rememberScreenBackgroundState
 import com.muedsa.uitl.LogUtil
+import kotlinx.coroutines.flow.update
 
 @OptIn(
     ExperimentalTvMaterial3Api::class,
@@ -73,11 +75,9 @@ fun AnimeDetailScreen(
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
 
-    val animeDetailLD by remember { viewModel.animeDetailLDState }
-    val commentsLP by remember { viewModel.commentsLPState }
-
-    val danSearchAnimeListLD by remember { viewModel.danSearchAnimeListLDState }
-    val danAnimeInfoLD by remember { viewModel.danAnimeInfoLDState }
+    val animeDetailLD by viewModel.animeDetailLDSF.collectAsState()
+    val danSearchAnimeListLD by viewModel.danSearchAnimeListLDSF.collectAsState()
+    val danAnimeInfoLD by viewModel.danAnimeInfoLDSF.collectAsState()
 
     val backgroundState = rememberScreenBackgroundState(
         initType = ScreenBackgroundType.SCRIM
@@ -89,14 +89,7 @@ fun AnimeDetailScreen(
         } else if (animeDetailLD.type == LazyType.SUCCESS) {
             if (animeDetailLD.data != null) {
                 backgroundState.url = animeDetailLD.data!!.video.cover
-                viewModel.searchDanAnime()
             }
-        }
-    }
-
-    LaunchedEffect(key1 = commentsLP) {
-        if (commentsLP.type == LazyType.FAILURE) {
-            errorMsgBoxState.error(commentsLP.error)
         }
     }
 
@@ -281,7 +274,7 @@ fun AnimeDetailScreen(
                                     item.animeTitle
                                 },
                                 onSelected = { _, item ->
-                                    viewModel.fetchDanBangumi(item.animeId)
+                                    viewModel.danBangumi(item.animeId)
                                 }
                             )
                         }
@@ -377,7 +370,9 @@ fun AnimeDetailScreen(
                             },
                             onItemClick = { _, anime ->
                                 LogUtil.fb("Click $anime")
-                                viewModel.animeIdLD.value = anime.aid.toString()
+                                viewModel.animeIdSF.update {
+                                    anime.aid.toString()
+                                }
                             }
                         )
                         Spacer(modifier = Modifier.height(25.dp))
@@ -399,7 +394,9 @@ fun AnimeDetailScreen(
                             },
                             onItemClick = { _, anime ->
                                 LogUtil.fb("Click $anime")
-                                viewModel.animeIdLD.value = anime.aid.toString()
+                                viewModel.animeIdSF.update {
+                                    anime.aid.toString()
+                                }
                             }
                         )
                         Spacer(modifier = Modifier.height(25.dp))
@@ -418,11 +415,9 @@ fun AnimeDetailScreen(
         }
     } else if (animeDetailLD.type == LazyType.FAILURE) {
         ErrorScreen {
-            viewModel.animeIdLD.value = viewModel.animeIdLD.value
+            viewModel.animeIdSF.value = viewModel.animeIdSF.value
         }
     } else {
         LoadingScreen()
     }
-
-
 }

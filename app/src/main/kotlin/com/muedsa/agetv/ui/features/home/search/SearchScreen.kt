@@ -19,9 +19,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -75,9 +75,8 @@ fun SearchScreen(
                 CardContentPadding * 2
     }
 
-    var searchText by remember { viewModel.searchTextState }
-
-    var searchAnimeLP by remember { viewModel.searchAnimeLPState }
+    val searchText by viewModel.searchTextSF.collectAsState()
+    val searchAnimeLP by viewModel.searchAnimeLPSF.collectAsState()
 
     LaunchedEffect(key1 = searchAnimeLP) {
         if (searchAnimeLP.type == LazyType.FAILURE) {
@@ -111,14 +110,13 @@ fun SearchScreen(
                 ),
                 value = searchText,
                 onValueChange = {
-                    searchText = it
+                    viewModel.searchTextSF.value = it
                 },
                 singleLine = true
             )
             Spacer(modifier = Modifier.width(16.dp))
             OutlinedIconButton(onClick = {
-                searchAnimeLP = LazyPagedList.new()
-                viewModel.fetchSearchAnime()
+                viewModel.searchAnime(LazyPagedList.new(searchText))
             }) {
                 Icon(
                     modifier = Modifier.size(ButtonDefaults.IconSize),
@@ -191,35 +189,24 @@ fun SearchScreen(
 
                 if (searchAnimeLP.type != LazyType.LOADING && searchAnimeLP.hasNext) {
                     item {
-                        Card(
-                            modifier = Modifier
-                                .size(AgePosterSize)
-                                .padding(end = ImageCardRowCardPadding),
-                            onClick = {
-                                if (searchText.isNotEmpty()) {
-                                    viewModel.fetchSearchAnime()
+                        Column {
+                            Card(
+                                modifier = Modifier
+                                    .size(AgePosterSize)
+                                    .padding(end = ImageCardRowCardPadding),
+                                onClick = {
+                                    viewModel.searchAnime(searchAnimeLP)
                                 }
-                            }
-                        ) {
-                            Column {
-                                Card(
-                                    modifier = Modifier
-                                        .size(AgePosterSize)
-                                        .padding(end = ImageCardRowCardPadding),
-                                    onClick = {
-                                        viewModel.fetchSearchAnime()
-                                    }
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Column(
-                                        modifier = Modifier.fillMaxSize(),
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Text(text = "继续加载")
-                                    }
+                                    Text(text = "继续加载")
                                 }
-                                Spacer(modifier = Modifier.height(contentHeight))
                             }
+                            Spacer(modifier = Modifier.height(contentHeight))
                         }
                     }
                 }

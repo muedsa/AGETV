@@ -1,15 +1,18 @@
 package com.muedsa.agetv.viewmodel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.muedsa.agetv.model.CatalogOptionsUIModel
 import com.muedsa.agetv.model.LazyPagedList
-import com.muedsa.agetv.model.age.AgeCatalogOption
 import com.muedsa.agetv.model.age.CatalogAnimeModel
 import com.muedsa.agetv.repository.AppRepository
 import com.muedsa.uitl.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -20,76 +23,57 @@ class CatalogViewModel @Inject constructor(
     private val repo: AppRepository
 ) : ViewModel() {
 
-    val orderState = mutableStateOf(AgeCatalogOption.Order[0])
-    val regionState = mutableStateOf(AgeCatalogOption.Regions[0])
-    val genreState = mutableStateOf(AgeCatalogOption.Genres[0])
-    val yearState = mutableStateOf(AgeCatalogOption.Years[0])
-    val seasonState = mutableStateOf(AgeCatalogOption.Seasons[0])
-    val statusState = mutableStateOf(AgeCatalogOption.Status[0])
-    val labelState = mutableStateOf(AgeCatalogOption.Labels[0])
-    val resourceState = mutableStateOf(AgeCatalogOption.Resources[0])
+    val querySF = MutableStateFlow(CatalogOptionsUIModel())
 
-    val animeLPState = mutableStateOf(LazyPagedList.new<CatalogAnimeModel>())
+    private val _animeLPSF =
+        MutableStateFlow(LazyPagedList.new<CatalogOptionsUIModel, CatalogAnimeModel>(querySF.value))
+    val animeLPSF: StateFlow<LazyPagedList<CatalogOptionsUIModel, CatalogAnimeModel>> = _animeLPSF
 
-    fun fetchAnimeCatalog() {
-        animeLPState.value = animeLPState.value.loadingNext()
-        viewModelScope.launch(context = Dispatchers.IO) {
-            try {
-                repo.catalog(
-                    genre = genreState.value.value,
-                    label = labelState.value.value,
-                    order = orderState.value.value,
-                    region = regionState.value.value,
-                    resource = regionState.value.value,
-                    season = seasonState.value.value,
-                    status = statusState.value.value,
-                    year = yearState.value.value,
-                    page = animeLPState.value.nextPage,
-                    size = PAGE_SIZE
-                ).let {
-                    animeLPState.value = animeLPState.value.successNext(
-                        it.videos,
-                        ceil(it.total.toDouble() / PAGE_SIZE).toInt()
-                    )
-                }
-            } catch (t: Throwable) {
-                withContext(Dispatchers.Main) {
-                    animeLPState.value = animeLPState.value.failNext(t)
-                }
-                LogUtil.fb(t)
+    fun catalog(lp: LazyPagedList<CatalogOptionsUIModel, CatalogAnimeModel>) {
+        viewModelScope.launch {
+            val loadingLP = lp.loadingNext()
+            _animeLPSF.value = loadingLP
+            _animeLPSF.value = withContext(Dispatchers.IO) {
+                fetchCatalog(loadingLP)
             }
         }
     }
 
-    fun resetCatalogOptions() {
-        orderState.value = AgeCatalogOption.Order[0]
-        regionState.value = AgeCatalogOption.Regions[0]
-        genreState.value = AgeCatalogOption.Genres[0]
-        yearState.value = AgeCatalogOption.Years[0]
-        seasonState.value = AgeCatalogOption.Seasons[0]
-        statusState.value = AgeCatalogOption.Status[0]
-        labelState.value = AgeCatalogOption.Labels[0]
-        resourceState.value = AgeCatalogOption.Resources[0]
+    private suspend fun fetchCatalog(
+        lp: LazyPagedList<CatalogOptionsUIModel, CatalogAnimeModel>
+    ): LazyPagedList<CatalogOptionsUIModel, CatalogAnimeModel> {
+        return try {
+            repo.catalog(
+                genre = lp.query.genre.value,
+                label = lp.query.label.value,
+                order = lp.query.order.value,
+                region = lp.query.region.value,
+                resource = lp.query.resource.value,
+                season = lp.query.season.value,
+                status = lp.query.status.value,
+                year = lp.query.year.value,
+                page = lp.nextPage,
+                size = PAGE_SIZE
+            ).let {
+                lp.successNext(it.videos, ceil(it.total.toDouble() / PAGE_SIZE).toInt())
+            }
+        } catch (t: Throwable) {
+            LogUtil.fb(t)
+            lp.failNext(t)
+        }
     }
 
-//    init {
-//        viewModelScope.launch {
-//            listOf(
-//                orderState,
-//                regionState,
-//                genreState,
-//                yearState,
-//                seasonState,
-//                statusState,
-//                labelState,
-//                resourceState
-//            ).forEach {
-//                snapshotFlow { it }.collect {
-//                    animeLPState.value = animeLPState.value.needNew()
-//                }
-//            }
-//        }
-//    }
+    fun resetCatalogOptions() {
+        querySF.update { it.default() }
+    }
+
+    init {
+        viewModelScope.launch {
+            querySF.collectLatest {
+                catalog(LazyPagedList.new(it))
+            }
+        }
+    }
 
     companion object {
         const val PAGE_SIZE = 20

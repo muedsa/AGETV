@@ -1,22 +1,22 @@
 package com.muedsa.agetv.viewmodel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.muedsa.agetv.exception.DataRequestException
 import com.muedsa.agetv.model.AgePlayInfoModel
 import com.muedsa.agetv.model.LazyData
-import com.muedsa.agetv.model.LazyPagedList
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.model.age.AnimeDetailPageModel
-import com.muedsa.agetv.model.age.CommentModel
 import com.muedsa.agetv.model.dandanplay.DanAnimeInfo
 import com.muedsa.agetv.model.dandanplay.DanSearchAnime
 import com.muedsa.agetv.repository.AppRepository
 import com.muedsa.uitl.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -27,51 +27,69 @@ class AnimeDetailViewModel @Inject constructor(
     private val repo: AppRepository
 ) : ViewModel() {
 
-    val animeIdLD = savedStateHandle.getLiveData(ANIME_ID_SAVED_STATE_KEY, "0")
-    val animeDetailLDState = mutableStateOf(LazyData.init<AnimeDetailPageModel>())
-    val commentsLPState = mutableStateOf(LazyPagedList.new<CommentModel>())
+    private val _navAnimeIdFlow = savedStateHandle.getStateFlow(ANIME_ID_SAVED_STATE_KEY, "0")
+    val animeIdSF = MutableStateFlow(_navAnimeIdFlow.value)
 
-    val danSearchAnimeListLDState = mutableStateOf<LazyData<List<DanSearchAnime>>>(LazyData.init())
-    val danAnimeInfoLDState = mutableStateOf<LazyData<DanAnimeInfo>>(LazyData.init())
+    private val _animeDetailLDSF = MutableStateFlow(LazyData.init<AnimeDetailPageModel>())
+    val animeDetailLDSF: StateFlow<LazyData<AnimeDetailPageModel>> = _animeDetailLDSF
 
-    private fun fetchAnimeDetail(aid: Int) {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            try {
-                repo.detail(aid).let {
-                    animeDetailLDState.value = LazyData.success(it)
-                }
-            } catch (t: Throwable) {
-                withContext(Dispatchers.Main) {
-                    animeDetailLDState.value = LazyData.fail(t)
-                }
-                LogUtil.fb(t)
+    private val _danSearchAnimeListLDSF = MutableStateFlow(LazyData.init<List<DanSearchAnime>>())
+    val danSearchAnimeListLDSF: StateFlow<LazyData<List<DanSearchAnime>>> = _danSearchAnimeListLDSF
+
+    private val _danAnimeInfoLDSF = MutableStateFlow(LazyData.init<DanAnimeInfo>())
+    val danAnimeInfoLDSF: StateFlow<LazyData<DanAnimeInfo>> = _danAnimeInfoLDSF
+
+
+    private fun animeDetail(aid: Int) {
+        viewModelScope.launch {
+            _animeDetailLDSF.value = LazyData.init()
+            _animeDetailLDSF.value = withContext(Dispatchers.IO) {
+                fetchAnimeDetail(aid)
             }
         }
     }
 
-    fun fetchNextPageComments() {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            try {
-                val paged = commentsLPState.value
-                if (animeIdLD.value != null && paged.type != LazyType.LOADING && (paged.page == 0 || paged.hasNext)) {
-                    repo.comment(aid = animeIdLD.value!!.toInt(), page = paged.nextPage).let {
-                        if (it.code == 0) {
-                            if (it.data != null) {
-                                commentsLPState.value = paged
-                                    .successNext(it.data.comments, it.data.pagination.totalPage)
-                            }
-                        } else {
-                            commentsLPState.value =
-                                paged.failNext(RuntimeException(it.message))
-                        }
-                    }
-                }
-            } catch (t: Throwable) {
-                withContext(Dispatchers.Main) {
-                    commentsLPState.value = commentsLPState.value.failNext(t)
-                }
-                LogUtil.fb(t)
+    fun danBangumi(animeId: Int) {
+        viewModelScope.launch {
+            _danAnimeInfoLDSF.value = LazyData.init()
+            _danAnimeInfoLDSF.value = withContext(Dispatchers.IO) {
+                fetchDanBangumi(animeId)
             }
+        }
+    }
+
+    private suspend fun fetchAnimeDetail(aid: Int): LazyData<AnimeDetailPageModel> {
+        return try {
+            LazyData.success(repo.detail(aid))
+        } catch (t: Throwable) {
+            LogUtil.fb(t)
+            LazyData.fail(t)
+        }
+    }
+
+    private suspend fun fetchSearchDanAnime(title: String): LazyData<List<DanSearchAnime>> {
+        return try {
+            val resp = repo.danDanPlaySearchAnime(title)
+            if (resp.errorCode != SUCCESS_CODE) {
+                throw DataRequestException(resp.errorMessage)
+            }
+            LazyData.success(resp.animes)
+        } catch (t: Throwable) {
+            LogUtil.fb(t)
+            LazyData.fail(t)
+        }
+    }
+
+    private suspend fun fetchDanBangumi(animeId: Int): LazyData<DanAnimeInfo> {
+        return try {
+            val resp = repo.danDanPlayGetAnime(animeId)
+            if (resp.errorCode != SUCCESS_CODE) {
+                throw DataRequestException(resp.errorMessage)
+            }
+            LazyData.success(resp.bangumi)
+        } catch (t: Throwable) {
+            LogUtil.fb(t)
+            LazyData.fail(t)
         }
     }
 
@@ -93,64 +111,41 @@ class AnimeDetailViewModel @Inject constructor(
                 }
                 LogUtil.fb(t)
             }
-
-        }
-
-    }
-
-    fun searchDanAnime() {
-        if (animeDetailLDState.value.type == LazyType.SUCCESS
-            || animeDetailLDState.value.data != null
-        ) {
-            val title = animeDetailLDState.value.data!!.video.name
-            viewModelScope.launch(context = Dispatchers.IO) {
-                try {
-                    repo.danDanPlaySearchAnime(title).let {
-                        if (it.errorCode == SUCCESS_CODE) {
-                            danSearchAnimeListLDState.value = LazyData.success(it.animes)
-                            if (it.animes.isNotEmpty()) {
-                                fetchDanBangumi(it.animes[0].animeId)
-                            }
-                        } else {
-                            throw DataRequestException(it.errorMessage)
-                        }
-                    }
-                } catch (t: Throwable) {
-                    withContext(Dispatchers.Main) {
-                        danSearchAnimeListLDState.value = LazyData.fail(t)
-                    }
-                    LogUtil.fb(t)
-                }
-            }
-        }
-    }
-
-    fun fetchDanBangumi(animeId: Int) {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            try {
-                repo.danDanPlayGetAnime(animeId).let {
-                    if (it.errorCode == SUCCESS_CODE) {
-                        danAnimeInfoLDState.value = LazyData.success(it.bangumi)
-                    } else {
-                        throw DataRequestException(it.errorMessage)
-                    }
-                }
-            } catch (t: Throwable) {
-                withContext(Dispatchers.Main) {
-                    danAnimeInfoLDState.value = LazyData.fail(t)
-                }
-                LogUtil.fb(t)
-            }
         }
     }
 
     init {
         viewModelScope.launch {
-            animeIdLD.observeForever {
-                it?.let {
-                    fetchAnimeDetail(it.toInt())
-                    // commentsLPState.value = LazyPagedList.new()
-                    danSearchAnimeListLDState.value = LazyData.init()
+            _navAnimeIdFlow.collectLatest { navAnimeId ->
+                animeIdSF.value = navAnimeId
+            }
+        }
+
+        viewModelScope.launch {
+            animeIdSF.collectLatest {
+                val aid = it.toInt()
+                animeDetail(aid)
+            }
+        }
+
+        viewModelScope.launch {
+            _animeDetailLDSF.collectLatest {
+                if (it.type == LazyType.SUCCESS) {
+                    val title = it.data?.video?.name
+                    if (!title.isNullOrBlank()) {
+                        _danSearchAnimeListLDSF.value = LazyData.init()
+                        _danSearchAnimeListLDSF.value = withContext(Dispatchers.IO) {
+                            fetchSearchDanAnime(title)
+                        }
+                    }
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            _danSearchAnimeListLDSF.collectLatest {
+                if (it.type == LazyType.SUCCESS && !it.data.isNullOrEmpty()) {
+                    danBangumi(it.data[0].animeId)
                 }
             }
         }

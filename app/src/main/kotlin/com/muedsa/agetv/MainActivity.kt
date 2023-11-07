@@ -31,11 +31,9 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition {
-            homePageViewModel.homeDataState.value.type == LazyType.LOADING
+            homePageViewModel.homeDataSF.value.type == LazyType.LOADING
         }
-        homePageViewModel.fetchHome()
         setContent {
-
             TvTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -52,7 +50,6 @@ class MainActivity : ComponentActivity() {
                             errorMsgBoxState = errorMsgBoxState
                         )
                     }
-
                 }
             }
         }

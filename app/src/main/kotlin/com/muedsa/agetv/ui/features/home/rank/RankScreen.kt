@@ -7,13 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -34,8 +33,9 @@ import com.muedsa.compose.tv.widget.ErrorScreen
 import com.muedsa.compose.tv.widget.ExposedDropdownMenuButton
 import com.muedsa.compose.tv.widget.LoadingScreen
 import com.muedsa.uitl.LogUtil
+import kotlinx.coroutines.flow.update
 
-@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun RankScreen(
     viewModel: RankViewModel = hiltViewModel(),
@@ -43,8 +43,8 @@ fun RankScreen(
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
 
-    var selectYear by remember { viewModel.selectedYear }
-    val rankLD by remember { viewModel.rankLDState }
+    val selectYear by viewModel.selectedYearSF.collectAsState()
+    val rankLD by viewModel.rankLDSF.collectAsState()
 
     LaunchedEffect(key1 = rankLD) {
         if (rankLD.type == LazyType.FAILURE) {
@@ -69,8 +69,9 @@ fun RankScreen(
                     item.text
                 },
                 onSelected = { _, item ->
-                    selectYear = item
-                    viewModel.fetchRank()
+                    viewModel.selectedYearSF.update {
+                        item
+                    }
                 }
             )
         }
@@ -168,12 +169,8 @@ fun RankScreen(
             LoadingScreen()
         } else {
             ErrorScreen {
-                viewModel.fetchRank()
+                viewModel.selectedYearSF.value = selectYear
             }
         }
-    }
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.fetchRank()
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,7 +52,7 @@ fun MainScreen(
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
 
-    val homeData by remember { viewModel.homeDataState }
+    val homeData by viewModel.homeDataSF.collectAsState()
 
     var title by remember { mutableStateOf("") }
     var subTitle by remember { mutableStateOf<String?>(null) }
@@ -174,12 +175,12 @@ fun MainScreen(
         } else {
             EmptyDataScreen()
         }
-    } else if (homeData.type == LazyType.FAILURE) {
-        ErrorScreen {
-            viewModel.fetchHome()
-        }
-    } else {
+    } else if (homeData.type == LazyType.LOADING) {
         LoadingScreen()
+    } else {
+        ErrorScreen {
+            viewModel.refreshHomeData()
+        }
     }
 }
 

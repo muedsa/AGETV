@@ -1,6 +1,5 @@
 package com.muedsa.agetv.viewmodel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.muedsa.agetv.exception.DataRequestException
@@ -11,6 +10,8 @@ import com.muedsa.agetv.service.AgePlayerService
 import com.muedsa.uitl.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -20,35 +21,43 @@ class SearchViewModel @Inject constructor(
     private val repo: AppRepository
 ) : ViewModel() {
 
-    val searchTextState = mutableStateOf("")
+    val searchTextSF = MutableStateFlow("")
+    private val _searchAnimeLPSF =
+        MutableStateFlow(LazyPagedList.new<String, CatalogAnimeModel>(searchTextSF.value))
+    val searchAnimeLPSF: StateFlow<LazyPagedList<String, CatalogAnimeModel>> = _searchAnimeLPSF
 
-    val searchAnimeLPState = mutableStateOf(LazyPagedList.new<CatalogAnimeModel>())
-
-    fun fetchSearchAnime() {
-        searchAnimeLPState.value = searchAnimeLPState.value.loadingNext()
-        viewModelScope.launch(context = Dispatchers.IO) {
-            try {
-                repo.search(
-                    query = searchTextState.value,
-                    page = searchAnimeLPState.value.nextPage
-                ).let {
-                    if (it.code == AgePlayerService.SUCCESS_CODE) {
-                        if (it.data != null) {
-                            searchAnimeLPState.value = searchAnimeLPState.value.successNext(
-                                it.data.videos,
-                                it.data.totalPage
-                            )
-                        }
-                    } else {
-                        throw DataRequestException(it.message ?: "age request error");
-                    }
+    fun searchAnime(lp: LazyPagedList<String, CatalogAnimeModel>) {
+        if (lp.query.isNotBlank()) {
+            viewModelScope.launch {
+                val loadingLP = lp.loadingNext()
+                _searchAnimeLPSF.value = loadingLP
+                _searchAnimeLPSF.value = withContext(Dispatchers.IO) {
+                    fetchSearch(loadingLP)
                 }
-            } catch (t: Throwable) {
-                withContext(Dispatchers.Main) {
-                    searchAnimeLPState.value = searchAnimeLPState.value.failNext(t)
-                }
-                LogUtil.fb(t)
             }
+        }
+    }
+
+
+    private suspend fun fetchSearch(
+        lp: LazyPagedList<String, CatalogAnimeModel>
+    ): LazyPagedList<String, CatalogAnimeModel> {
+        return try {
+            repo.search(
+                query = lp.query,
+                page = lp.nextPage
+            ).let {
+                if (it.code != AgePlayerService.SUCCESS_CODE) {
+                    throw DataRequestException(it.message ?: "age request error")
+                }
+                if (it.data == null) {
+                    throw DataRequestException("response data is null")
+                }
+                lp.successNext(it.data.videos, it.data.totalPage)
+            }
+        } catch (t: Throwable) {
+            LogUtil.fb(t)
+            lp.failNext(t)
         }
     }
 }

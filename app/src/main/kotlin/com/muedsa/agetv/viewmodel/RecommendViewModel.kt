@@ -1,6 +1,5 @@
 package com.muedsa.agetv.viewmodel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.muedsa.agetv.model.LazyData
@@ -9,6 +8,8 @@ import com.muedsa.agetv.repository.AppRepository
 import com.muedsa.uitl.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -18,21 +19,28 @@ class RecommendViewModel @Inject constructor(
     private val repo: AppRepository
 ) : ViewModel() {
 
-    val recommendLDState = mutableStateOf<LazyData<List<PosterAnimeModel>>>(LazyData.init())
+    private val _recommendLDSF = MutableStateFlow(LazyData.init<List<PosterAnimeModel>>())
+    val recommendLDSF: StateFlow<LazyData<List<PosterAnimeModel>>> = _recommendLDSF
 
-    fun fetchRecommend() {
-        recommendLDState.value = LazyData.init()
-        viewModelScope.launch(context = Dispatchers.IO) {
-            try {
-                repo.recommend().let {
-                    recommendLDState.value = LazyData.success(it.videos)
-                }
-            } catch (t: Throwable) {
-                withContext(Dispatchers.Main) {
-                    recommendLDState.value = LazyData.fail(t)
-                }
-                LogUtil.fb(t)
+    fun refreshRecommend() {
+        viewModelScope.launch {
+            _recommendLDSF.value = LazyData.init()
+            _recommendLDSF.value = withContext(Dispatchers.IO) {
+                fetchRecommend()
             }
         }
+    }
+
+    private suspend fun fetchRecommend(): LazyData<List<PosterAnimeModel>> {
+        return try {
+            LazyData.success(repo.recommend().videos)
+        } catch (t: Throwable) {
+            LogUtil.fb(t)
+            LazyData.fail(t)
+        }
+    }
+
+    init {
+        refreshRecommend()
     }
 }

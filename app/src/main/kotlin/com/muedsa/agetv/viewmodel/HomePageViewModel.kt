@@ -1,6 +1,5 @@
 package com.muedsa.agetv.viewmodel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.muedsa.agetv.model.LazyData
@@ -9,6 +8,8 @@ import com.muedsa.agetv.repository.AppRepository
 import com.muedsa.uitl.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -18,21 +19,27 @@ class HomePageViewModel @Inject constructor(
     private val repo: AppRepository
 ) : ViewModel() {
 
-    val homeDataState = mutableStateOf<LazyData<HomeModel>>(LazyData.init())
+    private val _homeDataSF = MutableStateFlow(LazyData.init<HomeModel>())
+    val homeDataSF: StateFlow<LazyData<HomeModel>> = _homeDataSF
 
-    fun fetchHome() {
-        homeDataState.value = LazyData.init()
-        viewModelScope.launch(context = Dispatchers.IO) {
-            try {
-                repo.home().let {
-                    homeDataState.value = LazyData.success(it)
-                }
-            } catch (t: Throwable) {
-                withContext(Dispatchers.Main) {
-                    homeDataState.value = LazyData.fail(t)
-                }
-                LogUtil.fb(t)
+    fun refreshHomeData() {
+        viewModelScope.launch {
+            _homeDataSF.value = withContext(Dispatchers.IO) {
+                fetchHomeData()
             }
         }
+    }
+
+    private suspend fun fetchHomeData(): LazyData<HomeModel> {
+        return try {
+            LazyData.success(repo.home())
+        } catch (t: Throwable) {
+            LogUtil.fb(t)
+            LazyData.fail(t)
+        }
+    }
+
+    init {
+        refreshHomeData()
     }
 }

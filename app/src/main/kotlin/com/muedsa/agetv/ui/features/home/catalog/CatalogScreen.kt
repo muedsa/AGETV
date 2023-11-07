@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +45,6 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.OutlinedIconButton
 import androidx.tv.material3.Text
-import com.muedsa.agetv.model.LazyPagedList
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.model.age.AgeCatalogOption
 import com.muedsa.agetv.ui.AgePosterSize
@@ -78,32 +78,16 @@ fun CatalogScreen(
                 CardContentPadding * 2
     }
 
-
-    val orderState = remember { viewModel.orderState }
-    val regionState = remember { viewModel.regionState }
-    val genreState = remember { viewModel.genreState }
-    val yearState = remember { viewModel.yearState }
-    val seasonState = remember { viewModel.seasonState }
-    val statusState = remember { viewModel.statusState }
-    val labelState = remember { viewModel.labelState }
-    val resourceState = remember { viewModel.resourceState }
-
-    val searchAnimeLPState by remember { viewModel.animeLPState }
-
-    val handleFetchCatalog = remember {
-        {
-            viewModel.animeLPState.value = LazyPagedList.new()
-            viewModel.fetchAnimeCatalog()
-        }
-    }
+    val query by viewModel.querySF.collectAsState()
+    val searchAnimeLP by viewModel.animeLPSF.collectAsState()
 
     var optionsExpand by remember {
         mutableStateOf(false)
     }
 
-    LaunchedEffect(key1 = searchAnimeLPState) {
-        if (searchAnimeLPState.type == LazyType.FAILURE) {
-            errorMsgBoxState.error(searchAnimeLPState.error)
+    LaunchedEffect(key1 = searchAnimeLP) {
+        if (searchAnimeLP.type == LazyType.FAILURE) {
+            errorMsgBoxState.error(searchAnimeLP.error)
         }
     }
 
@@ -134,7 +118,6 @@ fun CatalogScreen(
             Spacer(modifier = Modifier.width(16.dp))
             OutlinedIconButton(onClick = {
                 viewModel.resetCatalogOptions()
-                viewModel.fetchAnimeCatalog()
             }) {
                 Icon(
                     modifier = Modifier.size(ButtonDefaults.IconSize),
@@ -149,146 +132,210 @@ fun CatalogScreen(
             TvLazyColumn(contentPadding = PaddingValues(top = ImageCardRowCardPadding)) {
                 item {
                     CatalogOptionsWidget(
-                        "排序",
-                        orderState,
-                        AgeCatalogOption.Order,
-                        handleFetchCatalog
+                        title = "排序",
+                        selectedIndex = AgeCatalogOption.Order.indexOf(query.order),
+                        options = AgeCatalogOption.Order,
+                        onClick = { _, option ->
+                            if (query.order == option) {
+                                viewModel.querySF.value =
+                                    query.copy(order = AgeCatalogOption.Order[0])
+                            } else {
+                                viewModel.querySF.value = query.copy(order = option)
+                            }
+                        }
                     )
                 }
                 item {
                     CatalogOptionsWidget(
-                        "区域", regionState, AgeCatalogOption.Regions,
-                        handleFetchCatalog
+                        title = "区域",
+                        selectedIndex = AgeCatalogOption.Regions.indexOf(query.region),
+                        options = AgeCatalogOption.Regions,
+                        onClick = { _, option ->
+                            if (query.region == option) {
+                                viewModel.querySF.value =
+                                    query.copy(region = AgeCatalogOption.Regions[0])
+                            } else {
+                                viewModel.querySF.value = query.copy(region = option)
+                            }
+                        }
                     )
                 }
                 item {
                     CatalogOptionsWidget(
-                        "类型", genreState, AgeCatalogOption.Genres,
-                        handleFetchCatalog
+                        title = "类型",
+                        selectedIndex = AgeCatalogOption.Genres.indexOf(query.genre),
+                        options = AgeCatalogOption.Genres,
+                        onClick = { _, option ->
+                            if (query.genre == option) {
+                                viewModel.querySF.value =
+                                    query.copy(genre = AgeCatalogOption.Genres[0])
+                            } else {
+                                viewModel.querySF.value = query.copy(genre = option)
+                            }
+                        }
                     )
                 }
                 item {
                     CatalogOptionsWidget(
-                        "年份", yearState, AgeCatalogOption.Years,
-                        handleFetchCatalog
+                        title = "年份",
+                        selectedIndex = AgeCatalogOption.Years.indexOf(query.year),
+                        options = AgeCatalogOption.Years,
+                        onClick = { _, option ->
+                            if (query.year == option) {
+                                viewModel.querySF.value =
+                                    query.copy(year = AgeCatalogOption.Years[0])
+                            } else {
+                                viewModel.querySF.value = query.copy(year = option)
+                            }
+                        }
                     )
                 }
                 item {
                     CatalogOptionsWidget(
-                        "季度", seasonState, AgeCatalogOption.Seasons,
-                        handleFetchCatalog
+                        title = "季度",
+                        selectedIndex = AgeCatalogOption.Seasons.indexOf(query.season),
+                        options = AgeCatalogOption.Seasons,
+                        onClick = { _, option ->
+                            if (query.season == option) {
+                                viewModel.querySF.value =
+                                    query.copy(season = AgeCatalogOption.Seasons[0])
+                            } else {
+                                viewModel.querySF.value = query.copy(season = option)
+                            }
+                        }
                     )
                 }
                 item {
                     CatalogOptionsWidget(
-                        "状态", statusState, AgeCatalogOption.Status,
-                        handleFetchCatalog
+                        title = "状态",
+                        selectedIndex = AgeCatalogOption.Status.indexOf(query.status),
+                        options = AgeCatalogOption.Status,
+                        onClick = { _, option ->
+                            if (query.status == option) {
+                                viewModel.querySF.value =
+                                    query.copy(status = AgeCatalogOption.Status[0])
+                            } else {
+                                viewModel.querySF.value = query.copy(status = option)
+                            }
+                        }
                     )
                 }
                 item {
                     CatalogOptionsWidget(
-                        "标签", labelState, AgeCatalogOption.Labels,
-                        handleFetchCatalog
+                        title = "标签",
+                        selectedIndex = AgeCatalogOption.Labels.indexOf(query.label),
+                        options = AgeCatalogOption.Labels,
+                        onClick = { _, option ->
+                            if (query.label == option) {
+                                viewModel.querySF.value =
+                                    query.copy(label = AgeCatalogOption.Labels[0])
+                            } else {
+                                viewModel.querySF.value = query.copy(label = option)
+                            }
+                        }
                     )
                 }
                 item {
                     CatalogOptionsWidget(
-                        "资源", resourceState, AgeCatalogOption.Resources,
-                        handleFetchCatalog
+                        title = "资源",
+                        selectedIndex = AgeCatalogOption.Resources.indexOf(query.resource),
+                        options = AgeCatalogOption.Resources,
+                        onClick = { _, option ->
+                            if (query.resource == option) {
+                                viewModel.querySF.value =
+                                    query.copy(resource = AgeCatalogOption.Resources[0])
+                            } else {
+                                viewModel.querySF.value = query.copy(resource = option)
+                            }
+                        }
                     )
                 }
             }
         } else {
-            if (searchAnimeLPState.list.isNotEmpty()) {
-                val gridFocusRequester = remember { FocusRequester() }
+            val gridFocusRequester = remember { FocusRequester() }
 
-                TvLazyVerticalGrid(
-                    columns = TvGridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
-                    contentPadding = PaddingValues(
-                        top = ImageCardRowCardPadding,
-                        bottom = ImageCardRowCardPadding
-                    ),
-                    modifier = Modifier
-                        .focusRequester(gridFocusRequester)
-                        .focusProperties {
-                            exit = { gridFocusRequester.saveFocusedChild(); FocusRequester.Default }
-                            enter = {
-                                if (gridFocusRequester.restoreFocusedChild()) {
-                                    LogUtil.d("grid restoreFocusedChild")
-                                    FocusRequester.Cancel
-                                } else {
-                                    LogUtil.d("grid focused default child")
-                                    FocusRequester.Default
-                                }
-                            }
-                        }
-                ) {
-                    itemsIndexed(
-                        items = searchAnimeLPState.list,
-                        key = { _, item -> item.id }
-                    ) { index, item ->
-                        val itemFocusRequester = remember {
-                            FocusRequester()
-                        }
-                        ImageContentCard(
-                            modifier = Modifier
-                                .padding(end = ImageCardRowCardPadding)
-                                .focusRequester(itemFocusRequester),
-                            url = item.cover,
-                            imageSize = AgePosterSize,
-                            type = CardType.STANDARD,
-                            model = ContentModel(
-                                item.name,
-                                subtitle = item.tags,
-                                description = item.status
-                            ),
-                            onItemFocus = {
-                                backgroundState.url = item.cover
-                                backgroundState.type = ScreenBackgroundType.BLUR
-                            },
-                            onItemClick = {
-                                LogUtil.d("Click $item")
-                                onNavigate(NavigationItems.Detail, listOf(item.id.toString()))
-                            }
-                        )
-
-                        LaunchedEffect(key1 = Unit) {
-                            if (searchAnimeLPState.offset == index) {
-                                itemFocusRequester.requestFocus()
+            TvLazyVerticalGrid(
+                columns = TvGridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
+                contentPadding = PaddingValues(
+                    top = ImageCardRowCardPadding,
+                    bottom = ImageCardRowCardPadding
+                ),
+                modifier = Modifier
+                    .focusRequester(gridFocusRequester)
+                    .focusProperties {
+                        exit = { gridFocusRequester.saveFocusedChild(); FocusRequester.Default }
+                        enter = {
+                            if (gridFocusRequester.restoreFocusedChild()) {
+                                LogUtil.d("grid restoreFocusedChild")
+                                FocusRequester.Cancel
+                            } else {
+                                LogUtil.d("grid focused default child")
+                                FocusRequester.Default
                             }
                         }
                     }
+            ) {
+                itemsIndexed(
+                    items = searchAnimeLP.list,
+                    key = { _, item -> item.id }
+                ) { index, item ->
+                    val itemFocusRequester = remember {
+                        FocusRequester()
+                    }
+                    ImageContentCard(
+                        modifier = Modifier
+                            .padding(end = ImageCardRowCardPadding)
+                            .focusRequester(itemFocusRequester),
+                        url = item.cover,
+                        imageSize = AgePosterSize,
+                        type = CardType.STANDARD,
+                        model = ContentModel(
+                            item.name,
+                            subtitle = item.tags,
+                            description = item.status
+                        ),
+                        onItemFocus = {
+                            backgroundState.url = item.cover
+                            backgroundState.type = ScreenBackgroundType.BLUR
+                        },
+                        onItemClick = {
+                            LogUtil.d("Click $item")
+                            onNavigate(NavigationItems.Detail, listOf(item.id.toString()))
+                        }
+                    )
 
-                    if (searchAnimeLPState.type != LazyType.LOADING && searchAnimeLPState.hasNext) {
-                        item {
-                            Column {
-                                Card(
-                                    modifier = Modifier
-                                        .size(AgePosterSize)
-                                        .padding(end = ImageCardRowCardPadding),
-                                    onClick = {
-                                        viewModel.fetchAnimeCatalog()
-                                    }
-                                ) {
-                                    Column(
-                                        modifier = Modifier.fillMaxSize(),
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Text(text = "继续加载")
-                                    }
+                    LaunchedEffect(key1 = Unit) {
+                        if (searchAnimeLP.offset == index) {
+                            itemFocusRequester.requestFocus()
+                        }
+                    }
+                }
+
+                if (searchAnimeLP.type != LazyType.LOADING && searchAnimeLP.hasNext) {
+                    item {
+                        Column {
+                            Card(
+                                modifier = Modifier
+                                    .size(AgePosterSize)
+                                    .padding(end = ImageCardRowCardPadding),
+                                onClick = {
+                                    viewModel.catalog(searchAnimeLP)
                                 }
-                                Spacer(modifier = Modifier.height(contentHeight))
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(text = "继续加载")
+                                }
                             }
+                            Spacer(modifier = Modifier.height(contentHeight))
                         }
                     }
                 }
             }
         }
-    }
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.fetchAnimeCatalog()
     }
 }
 

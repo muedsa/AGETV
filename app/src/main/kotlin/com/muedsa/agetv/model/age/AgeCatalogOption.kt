@@ -1,7 +1,5 @@
 package com.muedsa.agetv.model.age
 
-import java.util.Collections
-
 sealed class AgeCatalogOption(val text: String, val value: String) {
     data object ALL : AgeCatalogOption("全部", "all")
 
@@ -100,22 +98,18 @@ sealed class AgeCatalogOption(val text: String, val value: String) {
     data object OrderByHits : AgeCatalogOption("点击量", "hits")
 
     companion object {
-        val Regions =
-            listOf(ALL, RegionJP, RegionCN, RegionWW).let { Collections.unmodifiableList(it) }
+        val Regions = listOf(ALL, RegionJP, RegionCN, RegionWW)
 
-        val Genres =
-            listOf(ALL, GenreTV, GenreMovie, GenreOVA).let { Collections.unmodifiableList(it) }
+        val Genres = listOf(ALL, GenreTV, GenreMovie, GenreOVA)
 
-        val Seasons = listOf(ALL, SeasonQ1, SeasonQ2, SeasonQ3, SeasonQ4).let {
-            Collections.unmodifiableList(it)
-        }
+        val Seasons = listOf(ALL, SeasonQ1, SeasonQ2, SeasonQ3, SeasonQ4)
 
         val Status = listOf(
             ALL,
             StatueSerializing,
             StatueCompleteD,
             StatueNotPlay
-        ).let { Collections.unmodifiableList(it) }
+        )
 
         val Years = listOf(
             ALL,
@@ -143,7 +137,7 @@ sealed class AgeCatalogOption(val text: String, val value: String) {
             Year2002,
             Year2001,
             Year2000AndBefore,
-        ).let { Collections.unmodifiableList(it) }
+        )
 
         val Labels = listOf(
             ALL,
@@ -191,12 +185,10 @@ sealed class AgeCatalogOption(val text: String, val value: String) {
             LabelFemaleOriented,
             LabelShort,
             LabelHappy
-        ).let { Collections.unmodifiableList(it) }
+        )
 
-        val Resources =
-            listOf(ALL, ResourceBDRIP, ResourceGERIP).let { Collections.unmodifiableList(it) }
+        val Resources = listOf(ALL, ResourceBDRIP, ResourceGERIP)
 
-        val Order =
-            listOf(OrderByTime, OrderByName, OrderByHits).let { Collections.unmodifiableList(it) }
+        val Order = listOf(OrderByTime, OrderByName, OrderByHits)
     }
 }

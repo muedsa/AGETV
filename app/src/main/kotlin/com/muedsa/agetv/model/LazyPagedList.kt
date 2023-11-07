@@ -1,7 +1,8 @@
 package com.muedsa.agetv.model
 
-data class LazyPagedList<T>(
-    val list: MutableList<T> = mutableListOf(),
+data class LazyPagedList<Q, R>(
+    val query: Q,
+    val list: MutableList<R> = mutableListOf(),
     val page: Int = 0,
     val totalPage: Int = 0,
     val offset: Int = 0,
@@ -12,13 +13,15 @@ data class LazyPagedList<T>(
     val hasNext get() = page == 0 || page < totalPage
 
     fun loadingNext() = LazyPagedList(
+        query = query,
         list = list,
         page = page,
         totalPage = totalPage,
         type = LazyType.LOADING
     )
 
-    fun successNext(appendList: List<T>, totalPage: Int) = LazyPagedList(
+    fun successNext(appendList: List<R>, totalPage: Int) = LazyPagedList(
+        query = query,
         offset = list.size,
         list = list.also { it.addAll(appendList) },
         page = nextPage,
@@ -27,6 +30,7 @@ data class LazyPagedList<T>(
     )
 
     fun failNext(error: Throwable?) = LazyPagedList(
+        query = query,
         list = list,
         page = page,
         totalPage = totalPage,
@@ -36,6 +40,7 @@ data class LazyPagedList<T>(
 
     companion object {
         @JvmStatic
-        fun <T> new(): LazyPagedList<T> = LazyPagedList(type = LazyType.SUCCESS)
+        fun <Q, R> new(query: Q): LazyPagedList<Q, R> =
+            LazyPagedList(query = query, type = LazyType.SUCCESS)
     }
 }

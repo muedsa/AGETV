@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -60,7 +61,9 @@ fun LatestUpdateScreen(
                 CardContentPadding * 2
     }
 
-    val latestUpdateLP by remember { viewModel.latestUpdateLPState }
+    val latestUpdateLP by viewModel.latestUpdateLPSF.collectAsState()
+
+    val gridFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(key1 = latestUpdateLP) {
         if (latestUpdateLP.type == LazyType.FAILURE) {
@@ -75,97 +78,86 @@ fun LatestUpdateScreen(
             style = MaterialTheme.typography.titleLarge
         )
 
-        if (latestUpdateLP.list.isNotEmpty()) {
-            val gridFocusRequester = remember { FocusRequester() }
-
-            TvLazyVerticalGrid(
-                modifier = Modifier
-                    .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp)
-                    .focusRequester(gridFocusRequester)
-                    .focusProperties {
-                        exit = { gridFocusRequester.saveFocusedChild(); FocusRequester.Default }
-                        enter = {
-                            if (gridFocusRequester.restoreFocusedChild()) {
-                                LogUtil.d("grid restoreFocusedChild")
-                                FocusRequester.Cancel
-                            } else {
-                                LogUtil.d("grid focused default child")
-                                FocusRequester.Default
-                            }
+        TvLazyVerticalGrid(
+            modifier = Modifier
+                .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp)
+                .focusRequester(gridFocusRequester)
+                .focusProperties {
+                    exit = { gridFocusRequester.saveFocusedChild(); FocusRequester.Default }
+                    enter = {
+                        if (gridFocusRequester.restoreFocusedChild()) {
+                            LogUtil.d("grid restoreFocusedChild")
+                            FocusRequester.Cancel
+                        } else {
+                            LogUtil.d("grid focused default child")
+                            FocusRequester.Default
                         }
-                    },
-                columns = TvGridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
-                contentPadding = PaddingValues(
-                    top = ImageCardRowCardPadding,
-                    bottom = ImageCardRowCardPadding
-                )
-            ) {
-                itemsIndexed(
-                    items = latestUpdateLP.list,
-                    key = { _, item -> item.aid }
-                ) { index, item ->
-                    val itemFocusRequester = remember {
-                        FocusRequester()
                     }
-                    ImageContentCard(
-                        modifier = Modifier
-                            .padding(end = ImageCardRowCardPadding)
-                            .focusRequester(itemFocusRequester),
-                        url = item.picSmall,
-                        imageSize = AgePosterSize,
-                        type = CardType.STANDARD,
-                        model = ContentModel(
-                            item.title,
-                            subtitle = item.newTitle
-                        ),
-                        onItemFocus = {
-                            backgroundState.url = item.picSmall
-                            backgroundState.type = ScreenBackgroundType.BLUR
-                        },
-                        onItemClick = {
-                            LogUtil.d("Click $item")
-                            onNavigate(NavigationItems.Detail, listOf(item.aid.toString()))
-                        }
-                    )
+                },
+            columns = TvGridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
+            contentPadding = PaddingValues(
+                top = ImageCardRowCardPadding,
+                bottom = ImageCardRowCardPadding
+            )
+        ) {
+            itemsIndexed(
+                items = latestUpdateLP.list,
+                key = { _, item -> item.aid }
+            ) { index, item ->
+                val itemFocusRequester = remember {
+                    FocusRequester()
+                }
+                ImageContentCard(
+                    modifier = Modifier
+                        .padding(end = ImageCardRowCardPadding)
+                        .focusRequester(itemFocusRequester),
+                    url = item.picSmall,
+                    imageSize = AgePosterSize,
+                    type = CardType.STANDARD,
+                    model = ContentModel(
+                        item.title,
+                        subtitle = item.newTitle
+                    ),
+                    onItemFocus = {
+                        backgroundState.url = item.picSmall
+                        backgroundState.type = ScreenBackgroundType.BLUR
+                    },
+                    onItemClick = {
+                        LogUtil.d("Click $item")
+                        onNavigate(NavigationItems.Detail, listOf(item.aid.toString()))
+                    }
+                )
 
-                    LaunchedEffect(key1 = Unit) {
-                        if (latestUpdateLP.offset == index) {
-                            itemFocusRequester.requestFocus()
-                        }
+                LaunchedEffect(key1 = Unit) {
+                    if (latestUpdateLP.offset == index) {
+                        itemFocusRequester.requestFocus()
                     }
                 }
+            }
 
-                if (latestUpdateLP.type != LazyType.LOADING && latestUpdateLP.hasNext) {
-                    item {
-                        Column {
-                            Card(
-                                modifier = Modifier
-                                    .size(AgePosterSize)
-                                    .padding(end = ImageCardRowCardPadding),
-                                onClick = {
-                                    viewModel.fetchLatestUpdate()
-                                }
-                            ) {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(text = "继续加载")
-                                }
+            if (latestUpdateLP.type != LazyType.LOADING && latestUpdateLP.hasNext) {
+                item {
+                    Column {
+                        Card(
+                            modifier = Modifier
+                                .size(AgePosterSize)
+                                .padding(end = ImageCardRowCardPadding),
+                            onClick = {
+                                viewModel.latestUpdate()
                             }
-                            Spacer(modifier = Modifier.height(contentHeight))
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(text = "继续加载")
+                            }
                         }
+                        Spacer(modifier = Modifier.height(contentHeight))
                     }
                 }
             }
         }
     }
-
-
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.fetchLatestUpdate()
-    }
-
 }
