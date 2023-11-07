@@ -69,6 +69,7 @@ import kotlin.time.toDuration
 @Composable
 fun DanmakuVideoPlayer(
     debug: Boolean = false,
+    videoPlayerBuilderSetting: ExoPlayer.Builder.() -> Unit = {},
     videoPlayerInit: ExoPlayer.() -> Unit,
     danmakuPlayerInit: DanmakuPlayer.() -> Unit
 ) {
@@ -89,6 +90,7 @@ fun DanmakuVideoPlayer(
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context)
+            .also(videoPlayerBuilderSetting)
             .build()
             .also {
                 if (debug) {
@@ -155,7 +157,7 @@ fun DanmakuVideoPlayer(
 @Composable
 fun SimpleVideoPlayer(
     debug: Boolean = false,
-    playerBuilderInit: ExoPlayer.Builder.() -> Unit = {},
+    playerBuilderSetting: ExoPlayer.Builder.() -> Unit = {},
     playerInit: ExoPlayer.() -> Unit
 ) {
     val context = LocalContext.current
@@ -164,7 +166,7 @@ fun SimpleVideoPlayer(
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context)
-            .also(playerBuilderInit)
+            .also(playerBuilderSetting)
             .build()
             .also {
                 if (debug) {
