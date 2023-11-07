@@ -35,10 +35,4 @@ class HomePageViewModel @Inject constructor(
             }
         }
     }
-
-    init {
-        viewModelScope.launch(context = Dispatchers.IO) {
-            fetchHome()
-        }
-    }
 }

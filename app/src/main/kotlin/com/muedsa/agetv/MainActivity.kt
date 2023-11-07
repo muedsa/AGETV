@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
         splashScreen.setKeepOnScreenCondition {
             homePageViewModel.homeDataState.value.type == LazyType.LOADING
         }
+        homePageViewModel.fetchHome()
         setContent {
 
             TvTheme {

@@ -23,7 +23,10 @@ import com.muedsa.uitl.LogUtil
 @Composable
 @OptIn(UnstableApi::class)
 fun PlaybackScreen(
-    mediaUrl: String
+    aid: Int,
+    episodeTitle: String,
+    mediaUrl: String,
+    danEpisodeId: Long = 0,
 ) {
     val context = LocalContext.current
     val errorMessageBoxState = remember { ErrorMessageBoxState() }
