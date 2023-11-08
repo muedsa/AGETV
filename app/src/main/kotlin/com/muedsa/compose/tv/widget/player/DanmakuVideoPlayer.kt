@@ -69,9 +69,9 @@ import kotlin.time.toDuration
 @Composable
 fun DanmakuVideoPlayer(
     debug: Boolean = false,
+    danmakuPlayerInit: DanmakuPlayer.() -> Unit = {},
     videoPlayerBuilderSetting: ExoPlayer.Builder.() -> Unit = {},
     videoPlayerInit: ExoPlayer.() -> Unit,
-    danmakuPlayerInit: DanmakuPlayer.() -> Unit
 ) {
 
     val context = LocalContext.current
