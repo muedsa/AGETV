@@ -37,12 +37,14 @@ import androidx.tv.material3.AssistChip
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
 import com.muedsa.agetv.PlaybackActivity
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.ui.AgePosterSize
 import com.muedsa.agetv.ui.RankFontColor
 import com.muedsa.agetv.ui.RankIconColor
+import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.AnimeDetailViewModel
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
@@ -68,7 +70,8 @@ import kotlinx.coroutines.flow.update
 @Composable
 fun AnimeDetailScreen(
     viewModel: AnimeDetailViewModel = hiltViewModel(),
-    errorMsgBoxState: ErrorMessageBoxState
+    errorMsgBoxState: ErrorMessageBoxState,
+    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
@@ -219,11 +222,11 @@ fun AnimeDetailScreen(
                     Spacer(modifier = Modifier.height(25.dp))
                 }
 
-                // 播放源
+                // 按钮列表
                 item {
 
-                    // 切换播放源
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        // 切换播放源
                         Text(
                             text = "播放源",
                             color = MaterialTheme.colorScheme.onBackground,
@@ -278,9 +281,21 @@ fun AnimeDetailScreen(
                                 }
                             )
                         }
+
+                        Spacer(modifier = Modifier.width(25.dp))
+                        OutlinedButton(
+                            onClick = {
+                                onNavigate(NavigationItems.Setting, null)
+                            }
+                        ) {
+                            Text(text = "设置")
+                        }
                     }
                     Spacer(modifier = Modifier.height(20.dp))
+                }
 
+                // 切换播放源
+                item {
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(0.9f),
                         verticalArrangement = Arrangement.Center,

@@ -30,17 +30,20 @@ fun PlaybackScreen(
     episodeTitle: String,
     mediaUrl: String,
     danEpisodeId: Long = 0,
-    viewModel: PlaybackViewModel = hiltViewModel()
+    playbackViewModel: PlaybackViewModel = hiltViewModel(),
 ) {
     val activity = (LocalContext.current as? Activity)
 
     val errorMsgBoxState = remember { ErrorMessageBoxState() }
     ErrorMessageBox(state = errorMsgBoxState) {
 
-        val danmakuListLD by viewModel.danmakuListLDSF.collectAsState()
+        val danmakuSettingLD by playbackViewModel.danmakuSettingLDSF.collectAsState()
+        val danmakuListLD by playbackViewModel.danmakuListLDSF.collectAsState()
 
-        LaunchedEffect(key1 = danEpisodeId) {
-            viewModel.loadDanmakuList(danEpisodeId)
+        LaunchedEffect(key1 = danmakuSettingLD) {
+            if (danmakuListLD.type == LazyType.FAILURE) {
+                errorMsgBoxState.error(danmakuListLD.error)
+            }
         }
 
         LaunchedEffect(key1 = danmakuListLD) {
@@ -49,9 +52,16 @@ fun PlaybackScreen(
             }
         }
 
-        if (danmakuListLD.type == LazyType.SUCCESS) {
+        if (danmakuListLD.type == LazyType.SUCCESS && danmakuSettingLD.type == LazyType.SUCCESS) {
+            var danmakuSetting = danmakuSettingLD.data!!
+
             DanmakuVideoPlayer(
                 debug = BuildConfig.DEBUG,
+                danmakuConfigSetting = {
+                    textSizeScale = danmakuSetting.danmakuSizeScale / 100f
+                    alpha = danmakuSetting.danmakuAlpha / 100f
+                    screenPart = danmakuSetting.danmakuScreenPart / 100f
+                },
                 danmakuPlayerInit = {
                     if (!danmakuListLD.data.isNullOrEmpty()) {
                         updateData(danmakuListLD.data!!)
@@ -70,7 +80,7 @@ fun PlaybackScreen(
 
                     override fun onRenderedFirstFrame() {
                         stopState.value = false
-                        viewModel.registerPlayerPositionSaver(
+                        playbackViewModel.registerPlayerPositionSaver(
                             aid,
                             episodeTitle,
                             this@DanmakuVideoPlayer,
@@ -103,6 +113,17 @@ fun PlaybackScreen(
                 playWhenReady = true
                 setMediaItem(MediaItem.fromUri(mediaUrl))
                 prepare()
+            }
+        }
+
+        if (danmakuSettingLD.type == LazyType.SUCCESS) {
+            val danmakuSetting = danmakuSettingLD.data!!
+            LaunchedEffect(key1 = danEpisodeId) {
+                playbackViewModel.loadDanmakuList(
+                    if (danmakuSetting.danmakuEnable)
+                        danEpisodeId
+                    else 0
+                )
             }
         }
     }

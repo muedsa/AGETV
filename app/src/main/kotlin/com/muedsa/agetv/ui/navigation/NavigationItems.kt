@@ -8,5 +8,7 @@ sealed class NavigationItems(
 
     data object Detail : NavigationItems("detail/{animeId}", listOf("{animeId}"))
 
+    data object Setting : NavigationItems("setting")
+
     data object NotFound : NavigationItems("not_found")
 }

@@ -69,6 +69,7 @@ import kotlin.time.toDuration
 @Composable
 fun DanmakuVideoPlayer(
     debug: Boolean = false,
+    danmakuConfigSetting: DanmakuConfig.() -> Unit = {},
     danmakuPlayerInit: DanmakuPlayer.() -> Unit = {},
     videoPlayerBuilderSetting: ExoPlayer.Builder.() -> Unit = {},
     videoPlayerInit: ExoPlayer.() -> Unit,
@@ -79,9 +80,7 @@ fun DanmakuVideoPlayer(
     val playerControlTicker = remember { mutableIntStateOf(0) }
 
     val danmakuConfig = remember {
-        DanmakuConfig().apply {
-            textSizeScale = 1.4f
-        }
+        DanmakuConfig().apply(danmakuConfigSetting)
     }
 
     val danmakuPlayer = remember {

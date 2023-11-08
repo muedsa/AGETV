@@ -5,22 +5,54 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.exoplayer.ExoPlayer
 import com.kuaishou.akdanmaku.data.DanmakuItemData
+import com.muedsa.agetv.KEY_DANMAKU_ALPHA
+import com.muedsa.agetv.KEY_DANMAKU_ENABLE
+import com.muedsa.agetv.KEY_DANMAKU_SCREEN_PART
+import com.muedsa.agetv.KEY_DANMAKU_SIZE_SCALE
+import com.muedsa.agetv.model.AppSettingModel
 import com.muedsa.agetv.model.LazyData
+import com.muedsa.agetv.repository.DataStoreRepo
 import com.muedsa.agetv.service.DanDanPlayApiService
 import com.muedsa.uitl.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class PlaybackViewModel @Inject constructor(
-    private val danDanPlayApiService: DanDanPlayApiService
+    private val danDanPlayApiService: DanDanPlayApiService,
+    private val dateStoreRepo: DataStoreRepo
 ) : ViewModel() {
+
+    val danmakuSettingLDSF: StateFlow<LazyData<AppSettingModel>> = dateStoreRepo.dataStore.data
+        .map { prefs ->
+            AppSettingModel(
+                danmakuEnable = prefs[KEY_DANMAKU_ENABLE] ?: true,
+                danmakuSizeScale = prefs[KEY_DANMAKU_SIZE_SCALE] ?: 140,
+                danmakuAlpha = prefs[KEY_DANMAKU_ALPHA] ?: 100,
+                danmakuScreenPart = prefs[KEY_DANMAKU_SCREEN_PART] ?: 100,
+            ).let { model ->
+                LazyData.success(model)
+            }
+        }
+        .catch {
+            LogUtil.d(it)
+            emit(LazyData.fail(it))
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = LazyData.init()
+        )
 
     private val _danmakuListLDSF = MutableStateFlow(LazyData.init<List<DanmakuItemData>>())
     val danmakuListLDSF: StateFlow<LazyData<List<DanmakuItemData>>> = _danmakuListLDSF

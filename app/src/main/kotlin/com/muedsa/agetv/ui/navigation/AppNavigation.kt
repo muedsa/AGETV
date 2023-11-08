@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.muedsa.agetv.ui.features.detail.AnimeDetailScreen
 import com.muedsa.agetv.ui.features.home.HomeNavScreen
+import com.muedsa.agetv.ui.features.setting.AppSettingScreen
 import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.NotFoundScreen
 
@@ -48,6 +49,17 @@ fun AppNavigation(navController: NavHostController, errorMsgBoxState: ErrorMessa
             })
         ) {
             AnimeDetailScreen(
+                errorMsgBoxState = errorMsgBoxState,
+                onNavigate = { navItem, pathParams ->
+                    onNavigate(navController, navItem, pathParams)
+                }
+            )
+        }
+
+        composable(
+            route = NavigationItems.Setting.path
+        ) {
+            AppSettingScreen(
                 errorMsgBoxState = errorMsgBoxState
             )
         }
