@@ -85,26 +85,34 @@ class PlaybackViewModel @Inject constructor(
         exoPlayer: ExoPlayer,
         stopState: State<Boolean>
     ) {
+        val id = "$aid:$episodeTitle"
+        synchronized(_saverIdSet) {
+            if (!_saverIdSet.contains(id)) {
+                _saverIdSet.add(id)
+                saverRunning(id, aid, episodeTitle, exoPlayer, stopState)
+            }
+        }
+    }
+
+    private fun saverRunning(
+        id: String,
+        aid: Int,
+        episodeTitle: String,
+        exoPlayer: ExoPlayer,
+        stopState: State<Boolean>
+    ) {
         viewModelScope.launch(Dispatchers.Unconfined) {
-            val id = "$aid:$episodeTitle"
-            synchronized(_saverIdSet) {
-                if (!_saverIdSet.contains(id)) {
-                    _saverIdSet.add(id)
-                    viewModelScope.launch(Dispatchers.Unconfined) {
-                        LogUtil.d("[Player position saver-${id}] running for $aid-$episodeTitle")
-                        while (!stopState.value) {
-                            delay(15 * 1000)
-                            val pos = withContext(Dispatchers.Main) {
-                                exoPlayer.currentPosition
-                            }
-                            LogUtil.d("[Player position saver-${id}] save pos: $pos for $aid-$episodeTitle")
-                        }
-                        LogUtil.d("[Player position saver-${id}] stop for $aid-$episodeTitle")
-                        synchronized(_saverIdSet) {
-                            _saverIdSet.remove(id)
-                        }
-                    }
+            LogUtil.d("[Player position saver-${id}] running for $aid-$episodeTitle")
+            while (!stopState.value) {
+                delay(15 * 1000)
+                val pos = withContext(Dispatchers.Main) {
+                    exoPlayer.currentPosition
                 }
+                LogUtil.d("[Player position saver-${id}] save pos: $pos for $aid-$episodeTitle")
+            }
+            LogUtil.d("[Player position saver-${id}] stop for $aid-$episodeTitle")
+            synchronized(_saverIdSet) {
+                _saverIdSet.remove(id)
             }
         }
     }
