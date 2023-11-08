@@ -67,7 +67,7 @@ fun AppSettingScreen(
             ) {
                 Text(
                     modifier = Modifier.width(100.dp),
-                    text = "弹幕开关",
+                    text = "全局弹幕开关",
                     color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.titleMedium
                 )

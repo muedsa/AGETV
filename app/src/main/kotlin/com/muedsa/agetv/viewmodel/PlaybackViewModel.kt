@@ -134,15 +134,15 @@ class PlaybackViewModel @Inject constructor(
         stopState: State<Boolean>
     ) {
         viewModelScope.launch(Dispatchers.Unconfined) {
-            LogUtil.d("[Player position saver-${id}] running for $aid-$episodeTitle")
+            LogUtil.d("[PlayerPositionSaver-${id}] running for $aid-$episodeTitle")
             while (!stopState.value) {
                 delay(15 * 1000)
                 val pos = withContext(Dispatchers.Main) {
                     exoPlayer.currentPosition
                 }
-                LogUtil.d("[Player position saver-${id}] save pos: $pos for $aid-$episodeTitle")
+                LogUtil.d("[PlayerPositionSaver-${id}] save pos: $pos for $aid-$episodeTitle")
             }
-            LogUtil.d("[Player position saver-${id}] stop for $aid-$episodeTitle")
+            LogUtil.d("[PlayerPositionSaver-${id}] stop for $aid-$episodeTitle")
             synchronized(_saverIdSet) {
                 _saverIdSet.remove(id)
             }

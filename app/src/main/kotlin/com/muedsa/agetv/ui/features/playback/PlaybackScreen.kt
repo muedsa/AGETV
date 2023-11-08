@@ -53,7 +53,7 @@ fun PlaybackScreen(
         }
 
         if (danmakuListLD.type == LazyType.SUCCESS && danmakuSettingLD.type == LazyType.SUCCESS) {
-            var danmakuSetting = danmakuSettingLD.data!!
+            val danmakuSetting = danmakuSettingLD.data!!
 
             DanmakuVideoPlayer(
                 debug = BuildConfig.DEBUG,
