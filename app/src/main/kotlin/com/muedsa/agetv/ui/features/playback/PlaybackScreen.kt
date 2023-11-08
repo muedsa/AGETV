@@ -1,12 +1,15 @@
 package com.muedsa.agetv.ui.features.playback
 
+import android.app.Activity
 import androidx.annotation.OptIn
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -29,6 +32,8 @@ fun PlaybackScreen(
     danEpisodeId: Long = 0,
     viewModel: PlaybackViewModel = hiltViewModel()
 ) {
+    val activity = (LocalContext.current as? Activity)
+
     val errorMsgBoxState = remember { ErrorMessageBoxState() }
     ErrorMessageBox(state = errorMsgBoxState) {
 
@@ -54,10 +59,44 @@ fun PlaybackScreen(
                 }
             ) {
                 addListener(object : Player.Listener {
+                    private val stopState = mutableStateOf(true)
+
                     override fun onPlayerErrorChanged(error: PlaybackException?) {
                         errorMsgBoxState.error(error, SnackbarDuration.Long)
                         error?.let {
                             LogUtil.fb(it, "exoplayer mediaUrl: $mediaUrl")
+                        }
+                    }
+
+                    override fun onRenderedFirstFrame() {
+                        stopState.value = false
+                        viewModel.registerPlayerPositionSaver(
+                            aid,
+                            episodeTitle,
+                            this@DanmakuVideoPlayer,
+                            stopState
+                        )
+                    }
+
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        LogUtil.d("onPlaybackStateChanged: $playbackState")
+                        when (playbackState) {
+                            Player.STATE_READY -> {
+
+                            }
+
+                            Player.STATE_ENDED -> {
+                                stopState.value = true
+                                activity?.finish()
+                            }
+
+                            Player.STATE_IDLE -> {
+                                stopState.value = true
+                            }
+
+                            Player.STATE_BUFFERING -> {
+
+                            }
                         }
                     }
                 })
