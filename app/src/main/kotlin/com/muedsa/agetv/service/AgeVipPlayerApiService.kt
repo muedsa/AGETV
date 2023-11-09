@@ -51,7 +51,7 @@ interface AgeVipPlayerApiService {
     data class PlayUrlResp(
         @SerialName("code") val code: Int = -200,
         @SerialName("msg") val msg: String = "",
-        @SerialName("success") val success: Int = 0,
+        // @SerialName("success") val success: Int = 0, // 暂时注释 接口有时返回Int有时返回String
         @SerialName("player") val player: String = "",
         @SerialName("type") val type: String = "",
         @SerialName("url") val url: String = "",
