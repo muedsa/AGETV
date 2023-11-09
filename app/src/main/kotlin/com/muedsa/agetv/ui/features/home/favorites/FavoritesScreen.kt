@@ -16,17 +16,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.foundation.lazy.grid.TvGridCells
 import androidx.tv.foundation.lazy.grid.TvLazyVerticalGrid
 import androidx.tv.foundation.lazy.grid.itemsIndexed
-import androidx.tv.foundation.lazy.grid.rememberTvLazyGridState
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
@@ -45,7 +42,7 @@ import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.uitl.LogUtil
 
-@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
     viewModel: FavoriteViewModel = hiltViewModel(),
@@ -58,9 +55,7 @@ fun FavoritesScreen(
         mutableStateOf(false)
     }
 
-    val gridFocusRequester = remember { FocusRequester() }
-
-    val tvLazyGridState = rememberTvLazyGridState()
+    val focusManager = LocalFocusManager.current
 
     Column(modifier = Modifier.padding(start = ScreenPaddingLeft)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -84,34 +79,17 @@ fun FavoritesScreen(
 
         TvLazyVerticalGrid(
             modifier = Modifier
-                .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp)
-                .focusRequester(gridFocusRequester)
-                .focusProperties {
-                    exit = {
-                        LogUtil.d("grid saveFocusedChild")
-                        gridFocusRequester.saveFocusedChild(); FocusRequester.Default
-                    }
-                    enter = {
-                        if (gridFocusRequester.restoreFocusedChild()) {
-                            LogUtil.d("grid restoreFocusedChild")
-                            FocusRequester.Cancel
-                        } else {
-                            LogUtil.d("grid focused default child")
-                            FocusRequester.Default
-                        }
-                    }
-                },
+                .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp),
             columns = TvGridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
             contentPadding = PaddingValues(
                 top = ImageCardRowCardPadding,
                 bottom = ImageCardRowCardPadding
-            ),
-            state = tvLazyGridState
+            )
         ) {
             itemsIndexed(
                 items = favoriteAnimeList,
                 key = { _, item -> item.id }
-            ) { _, item ->
+            ) { index, item ->
                 ImageContentCard(
                     modifier = Modifier
                         .padding(end = ImageCardRowCardPadding),
@@ -128,6 +106,11 @@ fun FavoritesScreen(
                     onItemClick = {
                         LogUtil.d("Click $item")
                         if (deleteMode) {
+                            if (index + 1 < favoriteAnimeList.size) {
+                                focusManager.moveFocus(FocusDirection.Next)
+                            } else {
+                                focusManager.moveFocus(FocusDirection.Previous)
+                            }
                             viewModel.remove(item)
                         } else {
                             onNavigate(NavigationItems.Detail, listOf(item.id.toString()))
