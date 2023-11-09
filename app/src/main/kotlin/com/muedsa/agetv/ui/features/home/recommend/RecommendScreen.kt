@@ -60,7 +60,7 @@ fun RecommendScreen(
             Text(
                 text = "推荐列表",
                 color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.headlineMedium
             )
 
             if (!recommendLD.data.isNullOrEmpty()) {

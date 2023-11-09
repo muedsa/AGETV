@@ -6,5 +6,6 @@ sealed class HomeNavTabs(val title: String) {
     data object Latest : HomeNavTabs("更新")
     data object Recommend : HomeNavTabs("推荐")
     data object Search : HomeNavTabs("搜索")
+    data object Favorites : HomeNavTabs("收藏")
     data object Catalog : HomeNavTabs("目录")
 }

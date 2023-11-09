@@ -11,12 +11,18 @@ import com.muedsa.agetv.model.age.AnimeDetailPageModel
 import com.muedsa.agetv.model.dandanplay.DanAnimeInfo
 import com.muedsa.agetv.model.dandanplay.DanSearchAnime
 import com.muedsa.agetv.repository.AppRepository
+import com.muedsa.agetv.room.dao.FavoriteAnimeDao
+import com.muedsa.agetv.room.model.FavoriteAnimeModel
 import com.muedsa.uitl.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -24,7 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AnimeDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repo: AppRepository
+    private val repo: AppRepository,
+    private val favoriteAnimeDao: FavoriteAnimeDao
 ) : ViewModel() {
 
     private val _navAnimeIdFlow = savedStateHandle.getStateFlow(ANIME_ID_SAVED_STATE_KEY, "0")
@@ -39,6 +46,18 @@ class AnimeDetailViewModel @Inject constructor(
     private val _danAnimeInfoLDSF = MutableStateFlow(LazyData.init<DanAnimeInfo>())
     val danAnimeInfoLDSF: StateFlow<LazyData<DanAnimeInfo>> = _danAnimeInfoLDSF
 
+    private val _favoriteRefreshSF = MutableStateFlow(0)
+    val favoriteModelSF = animeDetailLDSF.combine(_favoriteRefreshSF) { animeDetailLD, _ ->
+        if (animeDetailLD.type == LazyType.SUCCESS) {
+            animeDetailLD.data?.video?.id?.let {
+                favoriteAnimeDao.getById(it)
+            }
+        } else null
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null
+    )
 
     private fun animeDetail(aid: Int) {
         viewModelScope.launch {
@@ -90,6 +109,19 @@ class AnimeDetailViewModel @Inject constructor(
         } catch (t: Throwable) {
             LogUtil.fb(t)
             LazyData.fail(t)
+        }
+    }
+
+    fun favorite(model: FavoriteAnimeModel, favorite: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (favorite) {
+                favoriteAnimeDao.insertAll(model)
+            } else {
+                favoriteAnimeDao.delete(model)
+            }
+            _favoriteRefreshSF.update {
+                it + 1
+            }
         }
     }
 

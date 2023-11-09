@@ -1,0 +1,140 @@
+package com.muedsa.agetv.ui.features.home.favorites
+
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.tv.foundation.lazy.grid.TvGridCells
+import androidx.tv.foundation.lazy.grid.TvLazyVerticalGrid
+import androidx.tv.foundation.lazy.grid.itemsIndexed
+import androidx.tv.foundation.lazy.grid.rememberTvLazyGridState
+import androidx.tv.material3.ButtonDefaults
+import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.OutlinedButton
+import androidx.tv.material3.Text
+import com.muedsa.agetv.ui.AgePosterSize
+import com.muedsa.agetv.ui.navigation.NavigationItems
+import com.muedsa.agetv.viewmodel.FavoriteViewModel
+import com.muedsa.compose.tv.model.ContentModel
+import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
+import com.muedsa.compose.tv.theme.ScreenPaddingLeft
+import com.muedsa.compose.tv.widget.CardType
+import com.muedsa.compose.tv.widget.ImageContentCard
+import com.muedsa.compose.tv.widget.ScreenBackgroundState
+import com.muedsa.compose.tv.widget.ScreenBackgroundType
+import com.muedsa.uitl.LogUtil
+
+@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalComposeUiApi::class)
+@Composable
+fun FavoritesScreen(
+    viewModel: FavoriteViewModel = hiltViewModel(),
+    backgroundState: ScreenBackgroundState,
+    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
+) {
+
+    val favoriteAnimeList by viewModel.favoriteAnimeSF.collectAsState()
+    var deleteMode by remember {
+        mutableStateOf(false)
+    }
+
+    val gridFocusRequester = remember { FocusRequester() }
+
+    val tvLazyGridState = rememberTvLazyGridState()
+
+    Column(modifier = Modifier.padding(start = ScreenPaddingLeft)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = if (deleteMode) "删除模式" else "最近追番",
+                color = MaterialTheme.colorScheme.onBackground,
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Spacer(modifier = Modifier.width(30.dp))
+            OutlinedButton(onClick = {
+                deleteMode = !deleteMode
+            }) {
+                Text(if (deleteMode) "退出" else "删除模式")
+                Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
+                Icon(
+                    imageVector = if (deleteMode) Icons.Outlined.Check else Icons.Outlined.Delete,
+                    contentDescription = if (deleteMode) "退出" else "删除模式"
+                )
+            }
+        }
+
+        TvLazyVerticalGrid(
+            modifier = Modifier
+                .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp)
+                .focusRequester(gridFocusRequester)
+                .focusProperties {
+                    exit = {
+                        LogUtil.d("grid saveFocusedChild")
+                        gridFocusRequester.saveFocusedChild(); FocusRequester.Default
+                    }
+                    enter = {
+                        if (gridFocusRequester.restoreFocusedChild()) {
+                            LogUtil.d("grid restoreFocusedChild")
+                            FocusRequester.Cancel
+                        } else {
+                            LogUtil.d("grid focused default child")
+                            FocusRequester.Default
+                        }
+                    }
+                },
+            columns = TvGridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
+            contentPadding = PaddingValues(
+                top = ImageCardRowCardPadding,
+                bottom = ImageCardRowCardPadding
+            ),
+            state = tvLazyGridState
+        ) {
+            itemsIndexed(
+                items = favoriteAnimeList,
+                key = { _, item -> item.id }
+            ) { _, item ->
+                ImageContentCard(
+                    modifier = Modifier
+                        .padding(end = ImageCardRowCardPadding),
+                    url = item.cover,
+                    imageSize = AgePosterSize,
+                    type = CardType.STANDARD,
+                    model = ContentModel(
+                        item.name
+                    ),
+                    onItemFocus = {
+                        backgroundState.url = item.cover
+                        backgroundState.type = ScreenBackgroundType.BLUR
+                    },
+                    onItemClick = {
+                        LogUtil.d("Click $item")
+                        if (deleteMode) {
+                            viewModel.remove(item)
+                        } else {
+                            onNavigate(NavigationItems.Detail, listOf(item.id.toString()))
+                        }
+                    }
+                )
+            }
+        }
+    }
+}

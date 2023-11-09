@@ -1,10 +1,8 @@
 package com.muedsa.agetv
 
-import android.content.Context
 import com.google.common.net.HttpHeaders
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.muedsa.agetv.repository.AppRepository
-import com.muedsa.agetv.repository.DataStoreRepo
 import com.muedsa.agetv.service.AgeApiService
 import com.muedsa.agetv.service.AgePlayerService
 import com.muedsa.agetv.service.DanDanPlayApiService
@@ -13,7 +11,6 @@ import com.muedsa.uitl.LenientJson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -91,8 +88,4 @@ internal object AppModule {
             playerService = playerService,
             danDanPlayApiService = danDanPlayApiService
         )
-
-    @Singleton
-    @Provides
-    fun provideDataStoreRepository(@ApplicationContext app: Context) = DataStoreRepo(app)
 }

@@ -24,6 +24,7 @@ import androidx.tv.material3.TabRow
 import androidx.tv.material3.TabRowDefaults
 import androidx.tv.material3.Text
 import com.muedsa.agetv.ui.features.home.catalog.CatalogScreen
+import com.muedsa.agetv.ui.features.home.favorites.FavoritesScreen
 import com.muedsa.agetv.ui.features.home.latest.LatestUpdateScreen
 import com.muedsa.agetv.ui.features.home.main.MainScreen
 import com.muedsa.agetv.ui.features.home.rank.RankScreen
@@ -44,6 +45,7 @@ val tabs = listOf(
     HomeNavTabs.Latest,
     HomeNavTabs.Recommend,
     HomeNavTabs.Search,
+    HomeNavTabs.Favorites,
     HomeNavTabs.Catalog
 )
 
@@ -162,7 +164,12 @@ fun HomeContent(
             onNavigate = onNavigate
         )
 
-        5 -> CatalogScreen(
+        5 -> FavoritesScreen(
+            backgroundState = backgroundState,
+            onNavigate = onNavigate
+        )
+
+        6 -> CatalogScreen(
             backgroundState = backgroundState,
             errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate

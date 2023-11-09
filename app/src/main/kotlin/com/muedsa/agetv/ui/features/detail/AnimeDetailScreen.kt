@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,14 +35,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.foundation.lazy.list.TvLazyColumn
 import androidx.tv.material3.AssistChip
+import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
+import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
 import com.muedsa.agetv.PlaybackActivity
 import com.muedsa.agetv.model.LazyType
+import com.muedsa.agetv.room.model.FavoriteAnimeModel
 import com.muedsa.agetv.ui.AgePosterSize
+import com.muedsa.agetv.ui.FavoriteIconColor
 import com.muedsa.agetv.ui.RankFontColor
 import com.muedsa.agetv.ui.RankIconColor
 import com.muedsa.agetv.ui.navigation.NavigationItems
@@ -79,6 +84,7 @@ fun AnimeDetailScreen(
     val screenWidth = configuration.screenWidthDp.dp
 
     val animeDetailLD by viewModel.animeDetailLDSF.collectAsState()
+    val favoriteModel by viewModel.favoriteModelSF.collectAsState()
     val danSearchAnimeListLD by viewModel.danSearchAnimeListLDSF.collectAsState()
     val danAnimeInfoLD by viewModel.danAnimeInfoLDSF.collectAsState()
 
@@ -246,6 +252,31 @@ fun AnimeDetailScreen(
                                 selectedPlaySourceList = info.playLists[item]!!
                             }
                         )
+
+                        Spacer(modifier = Modifier.width(25.dp))
+                        OutlinedButton(onClick = {
+                            if (favoriteModel == null) {
+                                viewModel.favorite(
+                                    model = FavoriteAnimeModel(
+                                        id = animeDetail.video.id,
+                                        name = animeDetail.video.name,
+                                        cover = animeDetail.video.cover,
+                                        updateAt = System.currentTimeMillis()
+                                    ),
+                                    favorite = true
+                                )
+                            } else {
+                                viewModel.favorite(model = favoriteModel!!, favorite = false)
+                            }
+                        }) {
+                            Text(text = if (favoriteModel == null) "追番" else "已追")
+                            Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
+                            Icon(
+                                imageVector = Icons.Outlined.Favorite,
+                                contentDescription = "收藏",
+                                tint = if (favoriteModel == null) FavoriteIconColor else LocalContentColor.current
+                            )
+                        }
 
                         // 开启弹幕按钮
                         if (danAnimeInfoLD.type == LazyType.SUCCESS && danAnimeInfoLD.data != null) {

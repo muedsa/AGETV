@@ -75,7 +75,7 @@ fun LatestUpdateScreen(
         Text(
             text = "最近更新",
             color = MaterialTheme.colorScheme.onBackground,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.headlineMedium
         )
 
         TvLazyVerticalGrid(
