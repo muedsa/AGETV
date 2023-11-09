@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.kotlinSerialization)
-    kotlin("kapt")
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hiltAndroid)
     alias(libs.plugins.gmsGoogleService)
     alias(libs.plugins.firebaseCrashlytics)
@@ -82,7 +82,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.4"
     }
 
     packaging {
@@ -104,7 +104,7 @@ dependencies {
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.activity.compose)
     implementation(platform(libs.compose.bom))
     implementation(libs.runtime)
@@ -125,14 +125,10 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation.compose)
 
-    // implementation(libs.leanback)
-
     implementation(libs.coil)
     implementation(libs.coil.compose)
     implementation(libs.coil.transformers)
     // implementation(libs.coil.transformers.gpu)
-
-    implementation(libs.qrcode)
 
     implementation(libs.timber)
 
@@ -149,16 +145,15 @@ dependencies {
     implementation(libs.retrofit2.ktx.serialization)
     implementation(libs.okhttp3.logging)
 
+    implementation(libs.room)
+    ksp(libs.room.compiler)
+    implementation(libs.room.ktx)
+
     testImplementation(libs.junit4)
-    testImplementation(libs.robolectric)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
 
     //implementation(libs.material.icons.extended)
-}
-
-kapt {
-    correctErrorTypes = true
 }
