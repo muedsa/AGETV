@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -62,7 +61,9 @@ class AnimeDetailViewModel @Inject constructor(
         initialValue = null
     )
 
-    val progressedEpisodeTitleSetSF = animeDetailLDSF.map { animeDetailLD ->
+    private val _watchedEpisodeTitleSetRefreshSF = MutableStateFlow(0)
+    val watchedEpisodeTitleSetSF =
+        animeDetailLDSF.combine(_watchedEpisodeTitleSetRefreshSF) { animeDetailLD, _ ->
         (if (animeDetailLD.type == LazyType.SUCCESS) {
             animeDetailLD.data?.video?.id?.let {
                 episodeProgressDao.getListByAid(it)
@@ -137,6 +138,12 @@ class AnimeDetailViewModel @Inject constructor(
             _favoriteRefreshSF.update {
                 it + 1
             }
+        }
+    }
+
+    fun refreshWatchedEpisodeTitleSet() {
+        _watchedEpisodeTitleSetRefreshSF.update {
+            it + 1
         }
     }
 

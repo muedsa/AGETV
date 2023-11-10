@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,8 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.tv.foundation.lazy.list.TvLazyColumn
 import androidx.tv.material3.AssistChip
 import androidx.tv.material3.ButtonDefaults
@@ -82,10 +86,11 @@ fun AnimeDetailScreen(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val animeDetailLD by viewModel.animeDetailLDSF.collectAsState()
     val favoriteModel by viewModel.favoriteModelSF.collectAsState()
-    val progressedEpisodeTitleSet by viewModel.progressedEpisodeTitleSetSF.collectAsState()
+    val watchedEpisodeTitleSet by viewModel.watchedEpisodeTitleSetSF.collectAsState()
     val danSearchAnimeListLD by viewModel.danSearchAnimeListLDSF.collectAsState()
     val danAnimeInfoLD by viewModel.danAnimeInfoLDSF.collectAsState()
 
@@ -112,6 +117,18 @@ fun AnimeDetailScreen(
     LaunchedEffect(key1 = danAnimeInfoLD) {
         if (danAnimeInfoLD.type == LazyType.FAILURE) {
             errorMsgBoxState.error(danAnimeInfoLD.error)
+        }
+    }
+
+    DisposableEffect(key1 = lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshWatchedEpisodeTitleSet()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
@@ -388,7 +405,7 @@ fun AnimeDetailScreen(
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text(
-                                            text = if (progressedEpisodeTitleSet.contains(item[0]))
+                                            text = if (watchedEpisodeTitleSet.contains(item[0]))
                                                 "${item[0]}*" else item[0]
                                         )
                                         Text(
