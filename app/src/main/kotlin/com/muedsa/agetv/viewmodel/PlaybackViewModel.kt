@@ -1,9 +1,7 @@
 package com.muedsa.agetv.viewmodel
 
-import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.media3.exoplayer.ExoPlayer
 import com.kuaishou.akdanmaku.data.DanmakuItemData
 import com.muedsa.agetv.KEY_DANMAKU_ALPHA
 import com.muedsa.agetv.KEY_DANMAKU_ENABLE
@@ -12,11 +10,12 @@ import com.muedsa.agetv.KEY_DANMAKU_SIZE_SCALE
 import com.muedsa.agetv.model.AppSettingModel
 import com.muedsa.agetv.model.LazyData
 import com.muedsa.agetv.repository.DataStoreRepo
+import com.muedsa.agetv.room.dao.EpisodeProgressDao
+import com.muedsa.agetv.room.model.EpisodeProgressModel
 import com.muedsa.agetv.service.DanDanPlayApiService
 import com.muedsa.uitl.LogUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PlaybackViewModel @Inject constructor(
     private val danDanPlayApiService: DanDanPlayApiService,
-    private val dateStoreRepo: DataStoreRepo
+    dateStoreRepo: DataStoreRepo,
+    private val episodeProgressDao: EpisodeProgressDao
 ) : ViewModel() {
 
     val danmakuSettingLDSF: StateFlow<LazyData<AppSettingModel>> = dateStoreRepo.dataStore.data
@@ -57,7 +57,8 @@ class PlaybackViewModel @Inject constructor(
     private val _danmakuListLDSF = MutableStateFlow(LazyData.init<List<DanmakuItemData>>())
     val danmakuListLDSF: StateFlow<LazyData<List<DanmakuItemData>>> = _danmakuListLDSF
 
-    private val _saverIdSet: MutableSet<String> = mutableSetOf()
+    private val _episodeProgressSF = MutableStateFlow(EpisodeProgressModel.Empty)
+    val episodeProgressSF: StateFlow<EpisodeProgressModel> = _episodeProgressSF
 
     fun loadDanmakuList(episodeId: Long) {
         viewModelScope.launch {
@@ -111,41 +112,21 @@ class PlaybackViewModel @Inject constructor(
         }
     }
 
-    fun registerPlayerPositionSaver(
+    fun loadEpisodeProgress(
         aid: Int,
         episodeTitle: String,
-        exoPlayer: ExoPlayer,
-        stopState: State<Boolean>
     ) {
-        val id = "$aid:$episodeTitle"
-        synchronized(_saverIdSet) {
-            if (!_saverIdSet.contains(id)) {
-                _saverIdSet.add(id)
-                saverRunning(id, aid, episodeTitle, exoPlayer, stopState)
-            }
+        viewModelScope.launch(Dispatchers.IO) {
+            val titleHash = episodeTitle.hashCode()
+            _episodeProgressSF.value = episodeProgressDao.getOneByAidAndTitleHash(aid, titleHash)
+                ?: EpisodeProgressModel(aid, titleHash, episodeTitle, 0, 0, 0)
         }
     }
 
-    private fun saverRunning(
-        id: String,
-        aid: Int,
-        episodeTitle: String,
-        exoPlayer: ExoPlayer,
-        stopState: State<Boolean>
-    ) {
-        viewModelScope.launch(Dispatchers.Unconfined) {
-            LogUtil.d("[PlayerPositionSaver-${id}] running for $aid-$episodeTitle")
-            while (!stopState.value) {
-                delay(15 * 1000)
-                val pos = withContext(Dispatchers.Main) {
-                    exoPlayer.currentPosition
-                }
-                LogUtil.d("[PlayerPositionSaver-${id}] save pos: $pos for $aid-$episodeTitle")
-            }
-            LogUtil.d("[PlayerPositionSaver-${id}] stop for $aid-$episodeTitle")
-            synchronized(_saverIdSet) {
-                _saverIdSet.remove(id)
-            }
+    fun saveEpisodeProgress(model: EpisodeProgressModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            LogUtil.d("save episode progress: ${model.progress}/${model.duration}")
+            episodeProgressDao.upsert(model)
         }
     }
 }

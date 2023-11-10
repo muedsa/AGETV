@@ -11,6 +11,9 @@ interface EpisodeProgressDao {
     @Query("SELECT * FROM episode_progress WHERE aid = :aid")
     suspend fun getListByAid(aid: Int): List<EpisodeProgressModel>
 
+    @Query("SELECT * FROM episode_progress WHERE aid = :aid and title_hash = :titleHash")
+    suspend fun getOneByAidAndTitleHash(aid: Int, titleHash: Int): EpisodeProgressModel?
+
     @Upsert
     suspend fun upsert(model: EpisodeProgressModel)
 

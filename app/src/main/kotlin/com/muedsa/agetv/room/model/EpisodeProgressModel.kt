@@ -15,4 +15,8 @@ data class EpisodeProgressModel(
         defaultValue = "(CURRENT_TIMESTAMP)",
         index = true
     ) var updateAt: Long = 0
-)
+) {
+    companion object {
+        val Empty = EpisodeProgressModel(0, 0, "", 0, 0, 0)
+    }
+}
