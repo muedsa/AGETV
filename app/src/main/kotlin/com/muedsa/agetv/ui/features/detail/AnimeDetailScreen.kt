@@ -85,6 +85,7 @@ fun AnimeDetailScreen(
 
     val animeDetailLD by viewModel.animeDetailLDSF.collectAsState()
     val favoriteModel by viewModel.favoriteModelSF.collectAsState()
+    val progressedEpisodeTitleSet by viewModel.progressedEpisodeTitleSetSF.collectAsState()
     val danSearchAnimeListLD by viewModel.danSearchAnimeListLDSF.collectAsState()
     val danAnimeInfoLD by viewModel.danAnimeInfoLDSF.collectAsState()
 
@@ -386,7 +387,10 @@ fun AnimeDetailScreen(
                                     && danAnimeInfoLD.data?.episodes!!.size > index
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(text = item[0])
+                                        Text(
+                                            text = if (progressedEpisodeTitleSet.contains(item[0]))
+                                                "${item[0]}*" else item[0]
+                                        )
                                         Text(
                                             text = danAnimeInfoLD.data!!.episodes[index].episodeTitle,
                                             style = MaterialTheme.typography.labelSmall

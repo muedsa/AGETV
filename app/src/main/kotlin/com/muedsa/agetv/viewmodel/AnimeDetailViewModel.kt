@@ -11,6 +11,7 @@ import com.muedsa.agetv.model.age.AnimeDetailPageModel
 import com.muedsa.agetv.model.dandanplay.DanAnimeInfo
 import com.muedsa.agetv.model.dandanplay.DanSearchAnime
 import com.muedsa.agetv.repository.AppRepository
+import com.muedsa.agetv.room.dao.EpisodeProgressDao
 import com.muedsa.agetv.room.dao.FavoriteAnimeDao
 import com.muedsa.agetv.room.model.FavoriteAnimeModel
 import com.muedsa.uitl.LogUtil
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,7 +33,8 @@ import javax.inject.Inject
 class AnimeDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: AppRepository,
-    private val favoriteAnimeDao: FavoriteAnimeDao
+    private val favoriteAnimeDao: FavoriteAnimeDao,
+    private val episodeProgressDao: EpisodeProgressDao
 ) : ViewModel() {
 
     private val _navAnimeIdFlow = savedStateHandle.getStateFlow(ANIME_ID_SAVED_STATE_KEY, "0")
@@ -57,6 +60,18 @@ class AnimeDetailViewModel @Inject constructor(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = null
+    )
+
+    val progressedEpisodeTitleSetSF = animeDetailLDSF.map { animeDetailLD ->
+        (if (animeDetailLD.type == LazyType.SUCCESS) {
+            animeDetailLD.data?.video?.id?.let {
+                episodeProgressDao.getListByAid(it)
+            }
+        } else null)?.map { it.title }?.toSet() ?: emptySet()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptySet()
     )
 
     private fun animeDetail(aid: Int) {
