@@ -44,7 +44,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "0.0.1-alpha01"
-
+        setProperty("archivesBaseName", "AGETV-$versionName")
     }
 
     signingConfigs {
