@@ -62,17 +62,17 @@ class AnimeDetailViewModel @Inject constructor(
     )
 
     private val _watchedEpisodeTitleSetRefreshSF = MutableStateFlow(0)
-    val watchedEpisodeTitleSetSF =
+    val watchedEpisodeTitleMapSF =
         animeDetailLDSF.combine(_watchedEpisodeTitleSetRefreshSF) { animeDetailLD, _ ->
         (if (animeDetailLD.type == LazyType.SUCCESS) {
             animeDetailLD.data?.video?.id?.let {
                 episodeProgressDao.getListByAid(it)
             }
-        } else null)?.map { it.title }?.toSet() ?: emptySet()
+        } else null)?.associateBy({ it.title }, { it }) ?: emptyMap()
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptySet()
+            initialValue = emptyMap()
     )
 
     private fun animeDetail(aid: Int) {

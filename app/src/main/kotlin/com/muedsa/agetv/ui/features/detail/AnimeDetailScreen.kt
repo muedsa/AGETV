@@ -3,15 +3,10 @@ package com.muedsa.agetv.ui.features.detail
 import android.content.Intent
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -25,6 +20,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,7 +34,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.tv.foundation.lazy.list.TvLazyColumn
-import androidx.tv.material3.AssistChip
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
@@ -72,10 +67,7 @@ import com.muedsa.compose.tv.widget.rememberScreenBackgroundState
 import com.muedsa.uitl.LogUtil
 import kotlinx.coroutines.flow.update
 
-@OptIn(
-    ExperimentalTvMaterial3Api::class,
-    ExperimentalLayoutApi::class
-)
+@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun AnimeDetailScreen(
     viewModel: AnimeDetailViewModel = hiltViewModel(),
@@ -90,9 +82,11 @@ fun AnimeDetailScreen(
 
     val animeDetailLD by viewModel.animeDetailLDSF.collectAsState()
     val favoriteModel by viewModel.favoriteModelSF.collectAsState()
-    val watchedEpisodeTitleSet by viewModel.watchedEpisodeTitleSetSF.collectAsState()
+    val watchedEpisodeTitleMap by viewModel.watchedEpisodeTitleMapSF.collectAsState()
     val danSearchAnimeListLD by viewModel.danSearchAnimeListLDSF.collectAsState()
     val danAnimeInfoLD by viewModel.danAnimeInfoLDSF.collectAsState()
+
+    val episodeRelationMap = remember { mutableStateMapOf<String, Long>() }
 
     val backgroundState = rememberScreenBackgroundState(
         initType = ScreenBackgroundType.SCRIM
@@ -154,8 +148,7 @@ fun AnimeDetailScreen(
 
             TvLazyColumn(
                 modifier = Modifier
-                    .offset(x = ScreenPaddingLeft)
-                    .width(screenWidth - ScreenPaddingLeft),
+                    .padding(start = ScreenPaddingLeft),
                 contentPadding = PaddingValues(bottom = 100.dp)
             ) {
                 // top space
@@ -343,82 +336,59 @@ fun AnimeDetailScreen(
                     Spacer(modifier = Modifier.height(20.dp))
                 }
 
-                // 切换播放源
+                // 剧集列表
                 item {
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(0.9f),
-                        verticalArrangement = Arrangement.Center,
-                    ) {
-                        selectedPlaySourceList.forEachIndexed { index, item ->
-                            AssistChip(
-                                modifier = Modifier.padding(end = 8.dp, bottom = 8.dp),
-                                onClick = {
-                                    LogUtil.fb("click play: $item")
-                                    val url = if (animeDetail.isVip(selectedPlaySource)) {
-                                        "${animeDetail.playerJx["vip"]}${item[1]}"
-                                    } else {
-                                        "${animeDetail.playerJx["zj"]}${item[1]}"
-                                    }
-                                    LogUtil.fb("click playPage: $url")
-                                    viewModel.parsePlayInfo(
-                                        url = url,
-                                        onSuccess = {
-                                            LogUtil.fb("try play => $it")
-                                            val intent =
-                                                Intent(context, PlaybackActivity::class.java)
-                                            intent.putExtra(
-                                                PlaybackActivity.AID_KEY,
-                                                animeDetail.video.id
-                                            )
-                                            intent.putExtra(
-                                                PlaybackActivity.EPISODE_TITLE_KEY,
-                                                item[0]
-                                            )
-                                            intent.putExtra(
-                                                PlaybackActivity.MEDIA_URL_KEY,
-                                                it.realUrl
-                                            )
-                                            if (enabledDanmaku
-                                                && danAnimeInfoLD.type == LazyType.SUCCESS
-                                                && danAnimeInfoLD.data != null
-                                                && !danAnimeInfoLD.data?.episodes.isNullOrEmpty()
-                                                && danAnimeInfoLD.data?.episodes!!.size > index
-                                            ) {
-                                                intent.putExtra(
-                                                    PlaybackActivity.DAN_EPISODE_ID_KEY,
-                                                    danAnimeInfoLD.data?.episodes!![index].episodeId
-                                                )
-                                            }
-                                            context.startActivity(intent)
-                                        },
-                                        onError = {
-                                            errorMsgBoxState.error(it)
-                                        }
+                    EpisodeListWidget(
+                        episodeList = selectedPlaySourceList,
+                        danEpisodeList = danAnimeInfoLD.data?.episodes ?: emptyList(),
+                        episodeProgressMap = watchedEpisodeTitleMap,
+                        episodeRelationMap = episodeRelationMap,
+                        onEpisodeClick = { episode, danEpisode ->
+                            LogUtil.fb("click play: $episode")
+                            val url = if (animeDetail.isVip(selectedPlaySource)) {
+                                "${animeDetail.playerJx["vip"]}${episode[1]}"
+                            } else {
+                                "${animeDetail.playerJx["zj"]}${episode[1]}"
+                            }
+                            LogUtil.fb("click playPage: $url")
+                            viewModel.parsePlayInfo(
+                                url = url,
+                                onSuccess = {
+                                    LogUtil.fb("try play => $it")
+                                    val intent =
+                                        Intent(context, PlaybackActivity::class.java)
+                                    intent.putExtra(
+                                        PlaybackActivity.AID_KEY,
+                                        animeDetail.video.id
                                     )
-                                }
-                            ) {
-                                if (enabledDanmaku
-                                    && danAnimeInfoLD.type == LazyType.SUCCESS
-                                    && danAnimeInfoLD.data != null
-                                    && !danAnimeInfoLD.data?.episodes.isNullOrEmpty()
-                                    && danAnimeInfoLD.data?.episodes!!.size > index
-                                ) {
-                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(
-                                            text = if (watchedEpisodeTitleSet.contains(item[0]))
-                                                "${item[0]}*" else item[0]
-                                        )
-                                        Text(
-                                            text = danAnimeInfoLD.data!!.episodes[index].episodeTitle,
-                                            style = MaterialTheme.typography.labelSmall
+                                    intent.putExtra(
+                                        PlaybackActivity.EPISODE_TITLE_KEY,
+                                        episode[0]
+                                    )
+                                    intent.putExtra(
+                                        PlaybackActivity.MEDIA_URL_KEY,
+                                        it.realUrl
+                                    )
+                                    if (enabledDanmaku && danEpisode != null) {
+                                        intent.putExtra(
+                                            PlaybackActivity.DAN_EPISODE_ID_KEY,
+                                            danEpisode.episodeId
                                         )
                                     }
-                                } else {
-                                    Text(text = item[0])
+                                    context.startActivity(intent)
+                                },
+                                onError = {
+                                    errorMsgBoxState.error(it)
                                 }
+                            )
+                        },
+                        onChangeEpisodeRelation = {
+                            it.forEach { pair ->
+                                episodeRelationMap[pair.first] = pair.second.episodeId
                             }
                         }
-                    }
+                    )
+
                     Spacer(modifier = Modifier.height(25.dp))
                 }
 
