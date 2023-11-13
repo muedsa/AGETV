@@ -1,6 +1,7 @@
 package com.muedsa.compose.tv.widget.player
 
 import android.annotation.SuppressLint
+import android.icu.text.SimpleDateFormat
 import android.view.Gravity
 import android.view.KeyEvent
 import android.widget.FrameLayout
@@ -60,6 +61,7 @@ import com.kuaishou.akdanmaku.ui.DanmakuPlayer
 import com.kuaishou.akdanmaku.ui.DanmakuView
 import com.muedsa.compose.tv.widget.OutlinedIconBox
 import kotlinx.coroutines.delay
+import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -345,7 +347,8 @@ fun PlayerControl(
 @kotlin.OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun PlayerProgressIndicator(player: Player) {
-
+    val dateTimeFormat = remember { SimpleDateFormat.getDateTimeInstance() }
+    val systemStr = dateTimeFormat.format(Date())
     val currentStr = if (player.duration > 0L) {
         player.currentPosition.toDuration(DurationUnit.MILLISECONDS)
             .toComponents { hours, minutes, seconds, _ ->
@@ -386,7 +389,7 @@ fun PlayerProgressIndicator(player: Player) {
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "$currentStr / $totalStr",
+            text = "$systemStr    $currentStr / $totalStr",
             textAlign = TextAlign.Right,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1
