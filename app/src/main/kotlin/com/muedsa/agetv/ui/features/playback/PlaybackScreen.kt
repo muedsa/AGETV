@@ -62,6 +62,12 @@ fun PlaybackScreen(
 
     LaunchedEffect(key1 = playerEnd) {
         if (playerEnd) {
+            if (episodeProgress.aid == aid && exoplayerHolder != null) {
+                val exoPlayer = exoplayerHolder!!
+                episodeProgress.duration = exoPlayer.duration
+                episodeProgress.updateAt = System.currentTimeMillis()
+                playbackViewModel.saveEpisodeProgress(episodeProgress)
+            }
             errorMsgBoxState.error("播放结束,即将返回")
             delay(3_000)
             activity?.finish()
