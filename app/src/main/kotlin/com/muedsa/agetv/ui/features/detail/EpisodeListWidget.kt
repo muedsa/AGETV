@@ -2,6 +2,8 @@ package com.muedsa.agetv.ui.features.detail
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,12 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.foundation.lazy.list.TvLazyRow
@@ -35,6 +38,7 @@ import androidx.tv.material3.WideButton
 import com.muedsa.agetv.model.dandanplay.DanEpisode
 import com.muedsa.agetv.room.model.EpisodeProgressModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
+import kotlin.math.max
 
 const val EpisodePageSize = 20
 val EpisodeProgressStrokeWidth = 12.dp
@@ -109,30 +113,44 @@ fun EpisodeListWidget(
                         items = currentPartEpisodeList,
                         key = { _, item -> item[1] }
                     ) { episodePartIndex, episode ->
+                        val interactionSource = remember { MutableInteractionSource() }
+                        val focusedState = interactionSource.collectIsFocusedAsState()
                         WideButton(
                             modifier = Modifier
                                 .padding(end = 12.dp)
-                                .drawBehind {
+                                .drawWithCache {
                                     // 进度条
-                                    episodeProgressMap[episode[0]]?.let { model ->
-                                        val strokeWidthPx = EpisodeProgressStrokeWidth.toPx()
-                                        val wideButtonCornerRadiusPx = WideButtonCornerRadius.toPx()
-                                        val width = size.width * model.progress / model.duration
-                                        val height = strokeWidthPx / 2
-                                        clipRect(
-                                            right = width,
-                                            bottom = height
-                                        ) {
-                                            drawRoundRect(
-                                                color = Color.Red,
-                                                cornerRadius = CornerRadius(
-                                                    wideButtonCornerRadiusPx,
-                                                    wideButtonCornerRadiusPx
-                                                )
-                                            )
+                                    val model = episodeProgressMap[episode[0]]
+                                    val strokeWidthPx = EpisodeProgressStrokeWidth.toPx()
+                                    val wideButtonCornerRadiusPx = WideButtonCornerRadius.toPx()
+                                    val width = if (model != null) {
+                                        val progressRatio =
+                                            model.progress.toFloat() / model.duration
+                                        size.width * max(progressRatio, 0.1f)
+                                    } else 0f
+                                    val height = strokeWidthPx / 2
+                                    val cornerRadius = CornerRadius(
+                                        wideButtonCornerRadiusPx,
+                                        wideButtonCornerRadiusPx
+                                    )
+                                    onDrawWithContent {
+                                        drawContent()
+                                        if (width > 0) {
+                                            scale(if (focusedState.value) 1.1f else 1f) {
+                                                clipRect(
+                                                    right = width,
+                                                    bottom = height
+                                                ) {
+                                                    drawRoundRect(
+                                                        color = Color.Red,
+                                                        cornerRadius = cornerRadius
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 },
+                            interactionSource = interactionSource,
                             title = {
                                 Text(text = episode[0], overflow = TextOverflow.Ellipsis)
                             },

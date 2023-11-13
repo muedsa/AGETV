@@ -64,6 +64,7 @@ fun PlaybackScreen(
         if (playerEnd) {
             if (episodeProgress.aid == aid && exoplayerHolder != null) {
                 val exoPlayer = exoplayerHolder!!
+                episodeProgress.progress = exoPlayer.duration
                 episodeProgress.duration = exoPlayer.duration
                 episodeProgress.updateAt = System.currentTimeMillis()
                 playbackViewModel.saveEpisodeProgress(episodeProgress)
@@ -77,15 +78,17 @@ fun PlaybackScreen(
     LaunchedEffect(key1 = exoplayerHolder) {
         if (exoplayerHolder != null) {
             val exoPlayer = exoplayerHolder!!
-            delay(10_000)
-            if (episodeProgress.aid == aid) {
-                episodeProgress.progress = exoPlayer.currentPosition
-                episodeProgress.duration = exoPlayer.duration
-                if (episodeProgress.progress + 5_000 > episodeProgress.duration) {
-                    episodeProgress.progress = max(episodeProgress.duration - 5_000, 0)
+            while (exoplayerHolder != null) {
+                delay(10_000)
+                if (episodeProgress.aid == aid) {
+                    episodeProgress.progress = exoPlayer.currentPosition
+                    episodeProgress.duration = exoPlayer.duration
+                    if (episodeProgress.progress + 5_000 > episodeProgress.duration) {
+                        episodeProgress.progress = max(episodeProgress.duration - 5_000, 0)
+                    }
+                    episodeProgress.updateAt = System.currentTimeMillis()
+                    playbackViewModel.saveEpisodeProgress(episodeProgress)
                 }
-                episodeProgress.updateAt = System.currentTimeMillis()
-                playbackViewModel.saveEpisodeProgress(episodeProgress)
             }
         }
     }
@@ -119,18 +122,30 @@ fun PlaybackScreen(
                     if (exoplayerHolder == null) {
                         exoplayerHolder = this@DanmakuVideoPlayer
                         if (episodeProgress.progress > 0) {
-                            seekTo(episodeProgress.progress)
-                            val progressStr = episodeProgress.progress
-                                .toDuration(DurationUnit.MILLISECONDS)
-                                .toComponents { hours, minutes, seconds, _ ->
-                                    String.format(
-                                        "%02d:%02d:%02d",
-                                        hours,
-                                        minutes,
-                                        seconds,
-                                    )
+                            val position =
+                                if (episodeProgress.progress == episodeProgress.duration) {
+                                    // 如果上次已经播放完成则不跳转 从头播放
+                                    0
+                                } else if (episodeProgress.duration > 5_000 && episodeProgress.progress > episodeProgress.duration - 5_000) {
+                                    // 如果太过接近结束的位置
+                                    episodeProgress.duration - 5_000
+                                } else {
+                                    episodeProgress.progress
                                 }
-                            errorMsgBoxState.error("跳转到上次播放位置: $progressStr")
+                            if (position > 0) {
+                                seekTo(position)
+                                val positionStr = position
+                                    .toDuration(DurationUnit.MILLISECONDS)
+                                    .toComponents { hours, minutes, seconds, _ ->
+                                        String.format(
+                                            "%02d:%02d:%02d",
+                                            hours,
+                                            minutes,
+                                            seconds,
+                                        )
+                                    }
+                                errorMsgBoxState.error("跳转到上次播放位置: $positionStr")
+                            }
                         }
                     }
                 }
