@@ -81,7 +81,16 @@ fun TvColorPreview(modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Black
             )
         }
-
+        item {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.tertiaryContainer),
+                text = "[On]TertiaryContainer",
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                fontWeight = FontWeight.Black
+            )
+        }
         item {
             Text(
                 modifier = Modifier
