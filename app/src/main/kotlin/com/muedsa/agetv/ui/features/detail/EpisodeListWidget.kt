@@ -96,7 +96,7 @@ fun EpisodeListWidget(
                         style = MaterialTheme.typography.titleLarge,
                         maxLines = 1
                     )
-                    if (chunkIndex == 0) {
+                    if (chunkIndex == 0 && danEpisodeList.isNotEmpty()) {
                         Spacer(modifier = Modifier.width(ImageCardRowCardPadding))
                         Text(
                             text = "长按更改匹配的弹幕剧集",
@@ -179,11 +179,13 @@ fun EpisodeListWidget(
                                 )
                             },
                             onLongClick = {
-                                changeFocusFlagAfterLongClick++
-                                val index = episodePartIndex + chunkIndex * EpisodePageSize
-                                selectedEpisodeIndex = index
-                                selectedEpisode = episodeList[index]
-                                changeDanEpisodeMode = true
+                                if (danEpisodeList.isNotEmpty()) {
+                                    changeFocusFlagAfterLongClick++
+                                    val index = episodePartIndex + chunkIndex * EpisodePageSize
+                                    selectedEpisodeIndex = index
+                                    selectedEpisode = episodeList[index]
+                                    changeDanEpisodeMode = true
+                                }
                             }
                         )
                     }
