@@ -16,7 +16,7 @@ import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.ui.navigation.AppNavigation
 import com.muedsa.agetv.viewmodel.HomePageViewModel
 import com.muedsa.compose.tv.theme.TvTheme
-import com.muedsa.compose.tv.widget.AppCloseHandler
+import com.muedsa.compose.tv.widget.AppBackHandler
 import com.muedsa.compose.tv.widget.ErrorMessageBox
 import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val errorMsgBoxState = remember { ErrorMessageBoxState() }
-                    AppCloseHandler {
+                    AppBackHandler {
                         errorMsgBoxState.error("再次点击返回键退出")
                     }
                     ErrorMessageBox(state = errorMsgBoxState) {

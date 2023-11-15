@@ -11,7 +11,7 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
 
 @Composable
-fun AppCloseHandler(
+fun AppBackHandler(
     onAllowBack: () -> Unit = {}
 ) {
 

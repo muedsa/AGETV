@@ -4,12 +4,14 @@ import android.app.Activity
 import androidx.annotation.OptIn
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
@@ -36,7 +38,8 @@ fun PlaybackScreen(
     mediaUrl: String,
     danEpisodeId: Long = 0,
     playbackViewModel: PlaybackViewModel = hiltViewModel(),
-    errorMsgBoxState: ErrorMessageBoxState
+    errorMsgBoxState: ErrorMessageBoxState,
+    backListeners: SnapshotStateList<() -> Unit>
 ) {
     val activity = LocalContext.current as? Activity
 
@@ -90,6 +93,28 @@ fun PlaybackScreen(
                     playbackViewModel.saveEpisodeProgress(episodeProgress)
                 }
             }
+        }
+    }
+
+    DisposableEffect(key1 = exoplayerHolder) {
+        val listener = {
+            if (exoplayerHolder != null) {
+                val exoPlayer = exoplayerHolder!!
+                if (episodeProgress.aid == aid) {
+                    val currentPosition = exoPlayer.currentPosition
+                    if (currentPosition > 10_000) {
+                        // 观看超过10s才保存进度
+                        episodeProgress.progress = currentPosition
+                        episodeProgress.duration = exoPlayer.duration
+                        episodeProgress.updateAt = System.currentTimeMillis()
+                        playbackViewModel.saveEpisodeProgress(episodeProgress)
+                    }
+                }
+            }
+        }
+        backListeners.add(listener)
+        onDispose {
+            backListeners.remove(listener)
         }
     }
 
