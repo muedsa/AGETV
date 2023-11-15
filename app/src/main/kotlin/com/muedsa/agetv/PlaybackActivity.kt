@@ -4,11 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.NonInteractiveSurfaceDefaults
+import androidx.tv.material3.Surface
 import com.muedsa.agetv.ui.features.playback.PlaybackScreen
 import com.muedsa.compose.tv.theme.TvTheme
 import com.muedsa.compose.tv.widget.AppBackHandler
@@ -20,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class PlaybackActivity : ComponentActivity() {
 
+    @OptIn(ExperimentalTvMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,7 +36,11 @@ class PlaybackActivity : ComponentActivity() {
             TvTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color.Black
+                    shape = RectangleShape,
+                    colors = NonInteractiveSurfaceDefaults.colors(
+                        containerColor = Color.Black,
+                        contentColor = MaterialTheme.colorScheme.onBackground
+                    )
                 ) {
                     if (aid <= 0 || episodeTitle.isNullOrEmpty() || mediaUrl.isNullOrEmpty()) {
                         FillTextScreen(context = "视频地址错误")
