@@ -66,7 +66,7 @@ class AppRepository @Inject constructor(
             throw AgeParseException("get vUrl is empty, from:$url")
         }
         val portStr = if ((uri.scheme === "http" && uri.port == 80)
-            || (uri.scheme === "https" && uri.port == 80)
+            || (uri.scheme === "https" && uri.port == 443)
         ) {
             ""
         } else {
