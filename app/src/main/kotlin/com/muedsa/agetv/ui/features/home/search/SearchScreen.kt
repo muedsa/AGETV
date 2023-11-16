@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.foundation.lazy.grid.TvGridCells
@@ -44,10 +43,10 @@ import androidx.tv.material3.Text
 import com.muedsa.agetv.model.LazyPagedList
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.ui.AgePosterSize
+import com.muedsa.agetv.ui.GirdLastItemHeight
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.SearchViewModel
 import com.muedsa.compose.tv.model.ContentModel
-import com.muedsa.compose.tv.theme.CardContentPadding
 import com.muedsa.compose.tv.theme.CustomerColor
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
@@ -66,14 +65,6 @@ fun SearchScreen(
     errorMsgBoxState: ErrorMessageBoxState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
-    val fontScale = LocalConfiguration.current.fontScale
-    val titleMediumFontSize = MaterialTheme.typography.titleMedium.fontSize.value
-    val bodyMediumFontSize = MaterialTheme.typography.bodyMedium.fontSize.value
-    val contentHeight = remember {
-        (titleMediumFontSize * fontScale + 0.5f).dp +
-                (bodyMediumFontSize * fontScale + 0.5f).dp +
-                CardContentPadding * 2
-    }
 
     val searchText by viewModel.searchTextSF.collectAsState()
     val searchAnimeLP by viewModel.searchAnimeLPSF.collectAsState()
@@ -189,26 +180,28 @@ fun SearchScreen(
 
                 if (searchAnimeLP.type != LazyType.LOADING && searchAnimeLP.hasNext) {
                     item {
-                        Column {
-                            Card(
-                                modifier = Modifier
-                                    .size(AgePosterSize)
-                                    .padding(end = ImageCardRowCardPadding),
-                                onClick = {
-                                    viewModel.searchAnime(searchAnimeLP)
-                                }
-                            ) {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(text = "继续加载")
-                                }
+                        Card(
+                            modifier = Modifier
+                                .size(AgePosterSize)
+                                .padding(end = ImageCardRowCardPadding),
+                            onClick = {
+                                viewModel.searchAnime(searchAnimeLP)
                             }
-                            Spacer(modifier = Modifier.height(contentHeight))
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(text = "继续加载")
+                            }
                         }
                     }
+                }
+
+                // 最后一行占位
+                item {
+                    Spacer(modifier = Modifier.height(GirdLastItemHeight))
                 }
             }
         }
