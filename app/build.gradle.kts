@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.FileInputStream
 import java.util.Properties
@@ -44,7 +45,7 @@ android {
         targetSdk = 34
         versionCode = 2
         versionName = "0.0.1-alpha02"
-        setProperty("archivesBaseName", "AGETV-$versionName")
+        archivesName = "AGETV"
     }
 
     signingConfigs {
@@ -67,6 +68,7 @@ android {
     buildTypes {
         debug {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -75,7 +77,8 @@ android {
         }
 
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
