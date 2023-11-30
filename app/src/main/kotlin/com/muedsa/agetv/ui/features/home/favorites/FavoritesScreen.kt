@@ -1,5 +1,6 @@
 package com.muedsa.agetv.ui.features.home.favorites
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -56,6 +57,10 @@ fun FavoritesScreen(
     }
 
     val focusManager = LocalFocusManager.current
+
+    BackHandler(enabled = deleteMode) {
+        deleteMode = false
+    }
 
     Column(modifier = Modifier.padding(start = ScreenPaddingLeft)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
