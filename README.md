@@ -5,7 +5,9 @@
 [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/muedsa/AGETV/android.yml)](https://github.com/muedsa/AGETV/actions)
 
 A third party **android tv** client for a pirate anime video web.  
-最低版本支持: [API 24(Android 7.0 Nougat)](https://developer.android.com/about/versions/nougat)
+
+# Requirement
+最低Android版本: [API 24(Android 7.0 Nougat)](https://developer.android.com/about/versions/nougat)
 
 ## Preview
 [Screenshot](/screenshots/SCREENSHOT.md)  
