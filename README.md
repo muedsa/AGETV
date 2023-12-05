@@ -4,7 +4,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/muedsa/bilibililivetv/badge)](https://www.codefactor.io/repository/github/muedsa/AGETV)
 [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/muedsa/AGETV/android.yml)](https://github.com/muedsa/AGETV/actions)
 
-A third party **android tv** client for a pirate anime video web.
+A third party **android tv** client for a pirate anime video web.  
 最低版本支持: [API 24(Android 7.0 Nougat)](https://developer.android.com/about/versions/nougat)
 
 ## Preview
