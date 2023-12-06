@@ -198,8 +198,12 @@ class AnimeDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             _danSearchAnimeListLDSF.collectLatest {
-                if (it.type == LazyType.SUCCESS && !it.data.isNullOrEmpty()) {
-                    danBangumi(it.data[0].animeId)
+                if (it.type == LazyType.SUCCESS && it.data != null) {
+                    if (it.data.isNotEmpty()) {
+                        danBangumi(it.data[0].animeId)
+                    } else {
+                        _animeDetailLDSF.value = LazyData(type = LazyType.SUCCESS)
+                    }
                 }
             }
         }
