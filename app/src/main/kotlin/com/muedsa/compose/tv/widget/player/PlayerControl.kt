@@ -19,8 +19,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.LinearProgressIndicator
@@ -50,6 +50,7 @@ import androidx.tv.material3.Text
 import com.muedsa.compose.tv.widget.OutlinedIconBox
 import kotlinx.coroutines.delay
 import java.util.Date
+import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -183,7 +184,7 @@ fun PlayerControl(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     OutlinedIconBox(scaleUp = leftArrowBtnPressed) {
-                        Icon(Icons.Outlined.ArrowBack, contentDescription = "后退")
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "后退")
                     }
                     Spacer(modifier = Modifier.width(20.dp))
                     OutlinedIconBox(
@@ -201,7 +202,7 @@ fun PlayerControl(
                     }
                     Spacer(modifier = Modifier.width(20.dp))
                     OutlinedIconBox(scaleUp = rightArrowBtnPressed) {
-                        Icon(Icons.Outlined.ArrowForward, contentDescription = "前进")
+                        Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = "前进")
                     }
                 }
 
@@ -242,39 +243,16 @@ fun PlayerControl(
 fun PlayerProgressIndicator(player: Player) {
     val dateTimeFormat = remember { SimpleDateFormat.getDateTimeInstance() }
     val systemStr = dateTimeFormat.format(Date())
-    val currentStr = if (player.duration > 0L) {
-        player.currentPosition.toDuration(DurationUnit.MILLISECONDS)
-            .toComponents { hours, minutes, seconds, _ ->
-                String.format(
-                    "%02d:%02d:%02d",
-                    hours,
-                    minutes,
-                    seconds,
-                )
-            }
-    } else {
-        "--:--:--"
-    }
-    val totalStr = if (player.duration > 0L) {
-        player.duration.toDuration(DurationUnit.MILLISECONDS)
-            .toComponents { hours, minutes, seconds, _ ->
-                String.format(
-                    "%02d:%02d:%02d",
-                    hours,
-                    minutes,
-                    seconds,
-                )
-            }
-    } else {
-        "--:--:--"
-    }
+    val currentStr =
+        if (player.duration > 0L) durationToString(player.currentPosition) else "--:--:--"
+    val totalStr = if (player.duration > 0L) durationToString(player.duration) else "--:--:--"
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
         if (player.duration > 0L) {
             LinearProgressIndicator(
+                progress = { player.currentPosition.toFloat() / player.duration },
                 modifier = Modifier.fillMaxWidth(),
-                progress = player.currentPosition.toFloat() / player.duration,
             )
         } else {
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
@@ -304,4 +282,17 @@ fun groupTypeToString(group: Tracks.Group): String {
         C.TRACK_TYPE_CAMERA_MOTION -> "CAMERA_MOTION"
         else -> "OTHER"
     }
+}
+
+fun durationToString(duration: Long): String {
+    return duration.toDuration(DurationUnit.MILLISECONDS)
+        .toComponents { hours, minutes, seconds, _ ->
+            String.format(
+                locale = Locale.getDefault(),
+                "%02d:%02d:%02d",
+                hours,
+                minutes,
+                seconds,
+            )
+        }
 }
