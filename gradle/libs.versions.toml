@@ -1,5 +1,5 @@
 [versions]
-agp = "8.4.0-alpha04"
+agp = "8.4.0-alpha10"
 kotlin = "1.9.21"
 ksp = "1.9.22-1.0.17"
 core-ktx = "1.12.0"
