@@ -18,7 +18,7 @@ interface DanDanPlayApiService {
 
     @GET("v2/bangumi/{animeId}")
     suspend fun getAnime(
-        @Query("animeId") animeId: Int
+        @Path("animeId") animeId: Int
     ): DanBangumiResp
 
     @GET("v2/comment/{episodeId}")

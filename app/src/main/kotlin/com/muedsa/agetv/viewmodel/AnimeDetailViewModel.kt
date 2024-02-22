@@ -121,7 +121,7 @@ class AnimeDetailViewModel @Inject constructor(
             if (resp.errorCode != SUCCESS_CODE) {
                 throw DataRequestException(resp.errorMessage)
             }
-            LazyData.success(resp.bangumi)
+            LazyData.success(resp.bangumi!!)
         } catch (t: Throwable) {
             LogUtil.fb(t)
             LazyData.fail(t)
@@ -202,7 +202,7 @@ class AnimeDetailViewModel @Inject constructor(
                     if (it.data.isNotEmpty()) {
                         danBangumi(it.data[0].animeId)
                     } else {
-                        _animeDetailLDSF.value = LazyData(type = LazyType.SUCCESS)
+                        _danAnimeInfoLDSF.value = LazyData(type = LazyType.SUCCESS)
                     }
                 }
             }
