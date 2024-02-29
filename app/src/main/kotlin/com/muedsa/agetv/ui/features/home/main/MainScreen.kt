@@ -24,6 +24,7 @@ import androidx.tv.material3.ImmersiveList
 import androidx.tv.material3.MaterialTheme
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.ui.AgePosterSize
+import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.HomePageViewModel
 import com.muedsa.compose.tv.model.ContentModel
@@ -35,7 +36,6 @@ import com.muedsa.compose.tv.widget.ErrorScreen
 import com.muedsa.compose.tv.widget.ImageCardsRow
 import com.muedsa.compose.tv.widget.LoadingScreen
 import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
-import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.compose.tv.widget.StandardImageCardsRow
 import com.muedsa.uitl.LogUtil
@@ -44,12 +44,12 @@ import com.muedsa.uitl.LogUtil
 @Composable
 fun MainScreen(
     viewModel: HomePageViewModel = hiltViewModel(),
-    backgroundState: ScreenBackgroundState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
+    val backgroundState = LocalHomeScreenBackgroundState.current
     val errorMsgBoxState = LocalErrorMsgBoxState.current
 
     val homeData by viewModel.homeDataSF.collectAsState()

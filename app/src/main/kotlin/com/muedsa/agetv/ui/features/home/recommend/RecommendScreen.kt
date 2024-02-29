@@ -23,6 +23,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.ui.AgePosterSize
+import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.RecommendViewModel
 import com.muedsa.compose.tv.model.ContentModel
@@ -33,7 +34,6 @@ import com.muedsa.compose.tv.widget.ErrorScreen
 import com.muedsa.compose.tv.widget.ImageContentCard
 import com.muedsa.compose.tv.widget.LoadingScreen
 import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
-import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.uitl.LogUtil
 
@@ -42,9 +42,9 @@ import com.muedsa.uitl.LogUtil
 @Composable
 fun RecommendScreen(
     viewModel: RecommendViewModel = hiltViewModel(),
-    backgroundState: ScreenBackgroundState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
+    val backgroundState = LocalHomeScreenBackgroundState.current
     val errorMsgBoxState = LocalErrorMsgBoxState.current
 
     val recommendLD by viewModel.recommendLDSF.collectAsState()

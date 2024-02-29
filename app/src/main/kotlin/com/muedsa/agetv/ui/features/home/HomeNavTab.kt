@@ -33,7 +33,6 @@ import com.muedsa.agetv.ui.features.home.search.SearchScreen
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.HomePageViewModel
 import com.muedsa.compose.tv.widget.NotFoundScreen
-import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
@@ -53,9 +52,9 @@ val tabs = listOf(
 fun HomeNavTab(
     tabIndex: Int = 0,
     homePageViewModel: HomePageViewModel,
-    backgroundState: ScreenBackgroundState = ScreenBackgroundState(),
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> },
 ) {
+    val backgroundState = LocalHomeScreenBackgroundState.current
     var focusedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(focusedTabIndex) }
 
@@ -116,7 +115,6 @@ fun HomeNavTab(
         HomeContent(
             tabIndex = tabPanelIndex,
             homePageViewModel = homePageViewModel,
-            backgroundState = backgroundState,
             onNavigate = onNavigate
         )
     }
@@ -126,13 +124,11 @@ fun HomeNavTab(
 fun HomeContent(
     tabIndex: Int,
     homePageViewModel: HomePageViewModel,
-    backgroundState: ScreenBackgroundState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> },
 ) {
     when (tabIndex) {
         0 -> MainScreen(
             viewModel = homePageViewModel,
-            backgroundState = backgroundState,
             onNavigate = onNavigate
         )
 
@@ -141,29 +137,18 @@ fun HomeContent(
         )
 
         2 -> LatestUpdateScreen(
-            backgroundState = backgroundState,
             onNavigate = onNavigate
         )
 
         3 -> RecommendScreen(
-            backgroundState = backgroundState,
             onNavigate = onNavigate
         )
 
-        4 -> SearchScreen(
-            backgroundState = backgroundState,
-            onNavigate = onNavigate
-        )
+        4 -> SearchScreen()
 
-        5 -> FavoritesScreen(
-            backgroundState = backgroundState,
-            onNavigate = onNavigate
-        )
+        5 -> FavoritesScreen()
 
-        6 -> CatalogScreen(
-            backgroundState = backgroundState,
-            onNavigate = onNavigate
-        )
+        6 -> CatalogScreen()
 
         else -> NotFoundScreen()
     }

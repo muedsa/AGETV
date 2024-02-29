@@ -47,6 +47,7 @@ import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.model.age.AgeCatalogOption
 import com.muedsa.agetv.ui.AgePosterSize
 import com.muedsa.agetv.ui.GirdLastItemHeight
+import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.CatalogViewModel
 import com.muedsa.compose.tv.model.ContentModel
@@ -55,7 +56,6 @@ import com.muedsa.compose.tv.theme.ScreenPaddingLeft
 import com.muedsa.compose.tv.widget.CardType
 import com.muedsa.compose.tv.widget.ImageContentCard
 import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
-import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.uitl.LogUtil
 
@@ -63,9 +63,9 @@ import com.muedsa.uitl.LogUtil
 @Composable
 fun CatalogScreen(
     viewModel: CatalogViewModel = hiltViewModel(),
-    backgroundState: ScreenBackgroundState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
+    val backgroundState = LocalHomeScreenBackgroundState.current
     val errorMsgBoxState = LocalErrorMsgBoxState.current
 
     val query by viewModel.querySF.collectAsState()

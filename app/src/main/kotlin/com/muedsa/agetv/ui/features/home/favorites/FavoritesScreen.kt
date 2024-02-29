@@ -32,6 +32,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
 import com.muedsa.agetv.ui.AgePosterSize
+import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.FavoriteViewModel
 import com.muedsa.compose.tv.model.ContentModel
@@ -39,7 +40,6 @@ import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
 import com.muedsa.compose.tv.widget.CardType
 import com.muedsa.compose.tv.widget.ImageContentCard
-import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.uitl.LogUtil
 
@@ -47,9 +47,9 @@ import com.muedsa.uitl.LogUtil
 @Composable
 fun FavoritesScreen(
     viewModel: FavoriteViewModel = hiltViewModel(),
-    backgroundState: ScreenBackgroundState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
+    val backgroundState = LocalHomeScreenBackgroundState.current
 
     val favoriteAnimeList by viewModel.favoriteAnimeSF.collectAsState()
     var deleteMode by remember {

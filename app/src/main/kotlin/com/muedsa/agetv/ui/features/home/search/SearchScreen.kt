@@ -44,6 +44,7 @@ import com.muedsa.agetv.model.LazyPagedList
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.ui.AgePosterSize
 import com.muedsa.agetv.ui.GirdLastItemHeight
+import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.SearchViewModel
 import com.muedsa.compose.tv.model.ContentModel
@@ -53,7 +54,6 @@ import com.muedsa.compose.tv.theme.outline
 import com.muedsa.compose.tv.widget.CardType
 import com.muedsa.compose.tv.widget.ImageContentCard
 import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
-import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.uitl.LogUtil
 
@@ -61,9 +61,9 @@ import com.muedsa.uitl.LogUtil
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
-    backgroundState: ScreenBackgroundState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
+    val backgroundState = LocalHomeScreenBackgroundState.current
     val errorMsgBoxState = LocalErrorMsgBoxState.current
 
     val searchText by viewModel.searchTextSF.collectAsState()

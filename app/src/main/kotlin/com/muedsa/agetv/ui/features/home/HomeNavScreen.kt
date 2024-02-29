@@ -1,11 +1,18 @@
 package com.muedsa.agetv.ui.features.home
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.HomePageViewModel
 import com.muedsa.compose.tv.widget.ScreenBackground
+import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.rememberScreenBackgroundState
+
+val LocalHomeScreenBackgroundState = compositionLocalOf<ScreenBackgroundState> {
+    error("LocalHomeScreenBackgroundState not init")
+}
 
 @Composable
 fun HomeNavScreen(
@@ -15,10 +22,11 @@ fun HomeNavScreen(
 ) {
     val backgroundState = rememberScreenBackgroundState()
     ScreenBackground(state = backgroundState)
-    HomeNavTab(
-        tabIndex = tabIndex,
-        homePageViewModel = homePageViewModel,
-        backgroundState = backgroundState,
-        onNavigate = onNavigate
-    )
+    CompositionLocalProvider(value = LocalHomeScreenBackgroundState provides backgroundState) {
+        HomeNavTab(
+            tabIndex = tabIndex,
+            homePageViewModel = homePageViewModel,
+            onNavigate = onNavigate
+        )
+    }
 }
