@@ -47,12 +47,12 @@ import com.muedsa.agetv.ui.GirdLastItemHeight
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.SearchViewModel
 import com.muedsa.compose.tv.model.ContentModel
-import com.muedsa.compose.tv.theme.CustomerColor
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
+import com.muedsa.compose.tv.theme.outline
 import com.muedsa.compose.tv.widget.CardType
-import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.ImageContentCard
+import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
 import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.uitl.LogUtil
@@ -62,9 +62,9 @@ import com.muedsa.uitl.LogUtil
 fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
     backgroundState: ScreenBackgroundState,
-    errorMsgBoxState: ErrorMessageBoxState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
+    val errorMsgBoxState = LocalErrorMsgBoxState.current
 
     val searchText by viewModel.searchTextSF.collectAsState()
     val searchAnimeLP by viewModel.searchAnimeLPSF.collectAsState()
@@ -94,7 +94,7 @@ fun SearchScreen(
                     ),
                 textStyle = MaterialTheme.typography.bodyLarge,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = CustomerColor.outline,
+                    focusedBorderColor = MaterialTheme.colorScheme.outline,
                     cursorColor = MaterialTheme.colorScheme.onSurface,
                     focusedTextColor = MaterialTheme.colorScheme.onSurface,
                     unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,

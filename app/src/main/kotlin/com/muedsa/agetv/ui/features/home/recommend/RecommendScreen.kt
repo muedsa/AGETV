@@ -29,10 +29,10 @@ import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
 import com.muedsa.compose.tv.widget.CardType
-import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.ErrorScreen
 import com.muedsa.compose.tv.widget.ImageContentCard
 import com.muedsa.compose.tv.widget.LoadingScreen
+import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
 import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.uitl.LogUtil
@@ -43,9 +43,9 @@ import com.muedsa.uitl.LogUtil
 fun RecommendScreen(
     viewModel: RecommendViewModel = hiltViewModel(),
     backgroundState: ScreenBackgroundState,
-    errorMsgBoxState: ErrorMessageBoxState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
+    val errorMsgBoxState = LocalErrorMsgBoxState.current
 
     val recommendLD by viewModel.recommendLDSF.collectAsState()
 

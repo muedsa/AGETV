@@ -28,10 +28,10 @@ import com.muedsa.agetv.model.age.AgeCatalogOption
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.RankViewModel
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
-import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.ErrorScreen
 import com.muedsa.compose.tv.widget.ExposedDropdownMenuButton
 import com.muedsa.compose.tv.widget.LoadingScreen
+import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
 import com.muedsa.uitl.LogUtil
 import kotlinx.coroutines.flow.update
 
@@ -39,9 +39,9 @@ import kotlinx.coroutines.flow.update
 @Composable
 fun RankScreen(
     viewModel: RankViewModel = hiltViewModel(),
-    errorMsgBoxState: ErrorMessageBoxState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
+    val errorMsgBoxState = LocalErrorMsgBoxState.current
 
     val selectYear by viewModel.selectedYearSF.collectAsState()
     val rankLD by viewModel.rankLDSF.collectAsState()

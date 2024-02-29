@@ -55,11 +55,11 @@ import com.muedsa.compose.tv.theme.ScreenPaddingLeft
 import com.muedsa.compose.tv.widget.ContentBlock
 import com.muedsa.compose.tv.widget.ContentBlockType
 import com.muedsa.compose.tv.widget.EmptyDataScreen
-import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.ErrorScreen
 import com.muedsa.compose.tv.widget.ExposedDropdownMenuButton
 import com.muedsa.compose.tv.widget.FocusScaleSwitch
 import com.muedsa.compose.tv.widget.LoadingScreen
+import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
 import com.muedsa.compose.tv.widget.ScreenBackground
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.compose.tv.widget.StandardImageCardsRow
@@ -71,7 +71,6 @@ import kotlinx.coroutines.flow.update
 @Composable
 fun AnimeDetailScreen(
     viewModel: AnimeDetailViewModel = hiltViewModel(),
-    errorMsgBoxState: ErrorMessageBoxState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
     val context = LocalContext.current
@@ -79,6 +78,7 @@ fun AnimeDetailScreen(
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
     val lifecycleOwner = LocalLifecycleOwner.current
+    val errorMsgBoxState = LocalErrorMsgBoxState.current
 
     val animeDetailLD by viewModel.animeDetailLDSF.collectAsState()
     val favoriteModel by viewModel.favoriteModelSF.collectAsState()

@@ -11,11 +11,10 @@ import androidx.navigation.navArgument
 import com.muedsa.agetv.ui.features.detail.AnimeDetailScreen
 import com.muedsa.agetv.ui.features.home.HomeNavScreen
 import com.muedsa.agetv.ui.features.setting.AppSettingScreen
-import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.NotFoundScreen
 
 @Composable
-fun AppNavigation(navController: NavHostController, errorMsgBoxState: ErrorMessageBoxState) {
+fun AppNavigation(navController: NavHostController) {
 
     val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
         "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
@@ -35,7 +34,6 @@ fun AppNavigation(navController: NavHostController, errorMsgBoxState: ErrorMessa
             HomeNavScreen(
                 tabIndex = checkNotNull(it.arguments?.getInt("tabIndex")),
                 homePageViewModel = hiltViewModel(viewModelStoreOwner),
-                errorMsgBoxState = errorMsgBoxState,
                 onNavigate = { navItem, pathParams ->
                     onNavigate(navController, navItem, pathParams)
                 }
@@ -49,7 +47,6 @@ fun AppNavigation(navController: NavHostController, errorMsgBoxState: ErrorMessa
             })
         ) {
             AnimeDetailScreen(
-                errorMsgBoxState = errorMsgBoxState,
                 onNavigate = { navItem, pathParams ->
                     onNavigate(navController, navItem, pathParams)
                 }
@@ -59,9 +56,7 @@ fun AppNavigation(navController: NavHostController, errorMsgBoxState: ErrorMessa
         composable(
             route = NavigationItems.Setting.path
         ) {
-            AppSettingScreen(
-                errorMsgBoxState = errorMsgBoxState
-            )
+            AppSettingScreen()
         }
 
         composable(NavigationItems.NotFound.path) {

@@ -16,9 +16,9 @@ import androidx.tv.material3.Surface
 import com.muedsa.agetv.ui.features.playback.PlaybackScreen
 import com.muedsa.compose.tv.theme.TvTheme
 import com.muedsa.compose.tv.widget.AppBackHandler
-import com.muedsa.compose.tv.widget.ErrorMessageBox
-import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.FillTextScreen
+import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
+import com.muedsa.compose.tv.widget.Scaffold
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,9 +34,8 @@ class PlaybackActivity : ComponentActivity() {
         val episodeId = intent.getLongExtra(DAN_EPISODE_ID_KEY, 0)
         setContent {
             TvTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    shape = RectangleShape,
+                Scaffold(
+                    holdBack = false,
                     colors = NonInteractiveSurfaceDefaults.colors(
                         containerColor = Color.Black,
                         contentColor = MaterialTheme.colorScheme.onBackground
@@ -45,23 +44,26 @@ class PlaybackActivity : ComponentActivity() {
                     if (aid <= 0 || episodeTitle.isNullOrEmpty() || mediaUrl.isNullOrEmpty()) {
                         FillTextScreen(context = "视频地址错误")
                     } else {
-                        val errorMsgBoxState = remember { ErrorMessageBoxState() }
                         val backListeners = remember {
                             mutableStateListOf<() -> Unit>()
                         }
+                        val errorMsgBoxState = LocalErrorMsgBoxState.current
                         AppBackHandler {
                             backListeners.forEach {
                                 it()
                             }
                             errorMsgBoxState.error("再次点击返回键退出")
                         }
-                        ErrorMessageBox(state = errorMsgBoxState) {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            shape = RectangleShape,
+
+                            ) {
                             PlaybackScreen(
                                 aid = aid,
                                 episodeTitle = episodeTitle,
                                 mediaUrl = mediaUrl,
                                 danEpisodeId = episodeId,
-                                errorMsgBoxState = errorMsgBoxState,
                                 backListeners = backListeners
                             )
                         }

@@ -27,16 +27,15 @@ import androidx.tv.material3.Text
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.viewmodel.AppSettingViewModel
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
-import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.FocusScaleSwitch
+import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun AppSettingScreen(
-    viewModel: AppSettingViewModel = hiltViewModel(),
-    errorMsgBoxState: ErrorMessageBoxState,
+    viewModel: AppSettingViewModel = hiltViewModel()
 ) {
-
+    val errorMsgBoxState = LocalErrorMsgBoxState.current
     val settingLD by viewModel.settingLDSF.collectAsState()
 
     LaunchedEffect(key1 = settingLD) {

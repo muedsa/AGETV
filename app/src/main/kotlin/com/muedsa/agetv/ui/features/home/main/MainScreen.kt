@@ -31,10 +31,10 @@ import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
 import com.muedsa.compose.tv.widget.ContentBlock
 import com.muedsa.compose.tv.widget.EmptyDataScreen
-import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.ErrorScreen
 import com.muedsa.compose.tv.widget.ImageCardsRow
 import com.muedsa.compose.tv.widget.LoadingScreen
+import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
 import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.compose.tv.widget.StandardImageCardsRow
@@ -45,12 +45,12 @@ import com.muedsa.uitl.LogUtil
 fun MainScreen(
     viewModel: HomePageViewModel = hiltViewModel(),
     backgroundState: ScreenBackgroundState,
-    errorMsgBoxState: ErrorMessageBoxState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
+    val errorMsgBoxState = LocalErrorMsgBoxState.current
 
     val homeData by viewModel.homeDataSF.collectAsState()
 

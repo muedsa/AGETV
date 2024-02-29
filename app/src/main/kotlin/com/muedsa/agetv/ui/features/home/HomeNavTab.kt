@@ -32,7 +32,6 @@ import com.muedsa.agetv.ui.features.home.recommend.RecommendScreen
 import com.muedsa.agetv.ui.features.home.search.SearchScreen
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.HomePageViewModel
-import com.muedsa.compose.tv.widget.ErrorMessageBoxState
 import com.muedsa.compose.tv.widget.NotFoundScreen
 import com.muedsa.compose.tv.widget.ScreenBackgroundState
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
@@ -55,7 +54,6 @@ fun HomeNavTab(
     tabIndex: Int = 0,
     homePageViewModel: HomePageViewModel,
     backgroundState: ScreenBackgroundState = ScreenBackgroundState(),
-    errorMsgBoxState: ErrorMessageBoxState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> },
 ) {
     var focusedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
@@ -119,7 +117,6 @@ fun HomeNavTab(
             tabIndex = tabPanelIndex,
             homePageViewModel = homePageViewModel,
             backgroundState = backgroundState,
-            errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate
         )
     }
@@ -130,37 +127,31 @@ fun HomeContent(
     tabIndex: Int,
     homePageViewModel: HomePageViewModel,
     backgroundState: ScreenBackgroundState,
-    errorMsgBoxState: ErrorMessageBoxState,
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> },
 ) {
     when (tabIndex) {
         0 -> MainScreen(
             viewModel = homePageViewModel,
             backgroundState = backgroundState,
-            errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate
         )
 
         1 -> RankScreen(
-            errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate
         )
 
         2 -> LatestUpdateScreen(
             backgroundState = backgroundState,
-            errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate
         )
 
         3 -> RecommendScreen(
             backgroundState = backgroundState,
-            errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate
         )
 
         4 -> SearchScreen(
             backgroundState = backgroundState,
-            errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate
         )
 
@@ -171,7 +162,6 @@ fun HomeContent(
 
         6 -> CatalogScreen(
             backgroundState = backgroundState,
-            errorMsgBoxState = errorMsgBoxState,
             onNavigate = onNavigate
         )
 

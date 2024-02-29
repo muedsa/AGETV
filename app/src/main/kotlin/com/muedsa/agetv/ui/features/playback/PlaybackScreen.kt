@@ -22,7 +22,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.muedsa.agetv.BuildConfig
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.viewmodel.PlaybackViewModel
-import com.muedsa.compose.tv.widget.ErrorMessageBoxState
+import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
 import com.muedsa.compose.tv.widget.player.DanmakuVideoPlayer
 import com.muedsa.uitl.LogUtil
 import kotlinx.coroutines.delay
@@ -38,10 +38,10 @@ fun PlaybackScreen(
     mediaUrl: String,
     danEpisodeId: Long = 0,
     playbackViewModel: PlaybackViewModel = hiltViewModel(),
-    errorMsgBoxState: ErrorMessageBoxState,
     backListeners: SnapshotStateList<() -> Unit>
 ) {
     val activity = LocalContext.current as? Activity
+    val errorMsgBoxState = LocalErrorMsgBoxState.current
 
     val danmakuSettingLD by playbackViewModel.danmakuSettingLDSF.collectAsState()
     val danmakuListLD by playbackViewModel.danmakuListLDSF.collectAsState()
@@ -163,6 +163,7 @@ fun PlaybackScreen(
                                     .toDuration(DurationUnit.MILLISECONDS)
                                     .toComponents { hours, minutes, seconds, _ ->
                                         String.format(
+                                            locale = java.util.Locale.getDefault(),
                                             "%02d:%02d:%02d",
                                             hours,
                                             minutes,
