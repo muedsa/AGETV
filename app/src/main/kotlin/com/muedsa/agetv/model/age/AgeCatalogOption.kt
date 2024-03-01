@@ -11,6 +11,7 @@ sealed class AgeCatalogOption(val text: String, val value: String) {
     data object GenreMovie : AgeCatalogOption("剧场版", "剧场版")
     data object GenreOVA : AgeCatalogOption("OVA", "OVA")
 
+    data object Year2024 : AgeCatalogOption("2024", "2024")
     data object Year2023 : AgeCatalogOption("2023", "2023")
     data object Year2022 : AgeCatalogOption("2022", "2022")
     data object Year2021 : AgeCatalogOption("2021", "2021")
@@ -113,6 +114,7 @@ sealed class AgeCatalogOption(val text: String, val value: String) {
 
         val Years = listOf(
             ALL,
+            Year2024,
             Year2023,
             Year2022,
             Year2021,

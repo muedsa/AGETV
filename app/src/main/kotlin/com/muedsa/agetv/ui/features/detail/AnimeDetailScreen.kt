@@ -2,7 +2,9 @@ package com.muedsa.agetv.ui.features.detail
 
 import android.content.Intent
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +16,7 @@ import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -34,13 +37,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.tv.foundation.lazy.list.TvLazyColumn
+import androidx.tv.foundation.lazy.list.items
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedButton
+import androidx.tv.material3.OutlinedIconButton
+import androidx.tv.material3.RadioButton
 import androidx.tv.material3.Text
+import androidx.tv.material3.WideButtonDefaults
 import com.muedsa.agetv.PlaybackActivity
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.room.model.FavoriteAnimeModel
@@ -56,13 +63,14 @@ import com.muedsa.compose.tv.widget.ContentBlock
 import com.muedsa.compose.tv.widget.ContentBlockType
 import com.muedsa.compose.tv.widget.EmptyDataScreen
 import com.muedsa.compose.tv.widget.ErrorScreen
-import com.muedsa.compose.tv.widget.ExposedDropdownMenuButton
-import com.muedsa.compose.tv.widget.FocusScaleSwitch
 import com.muedsa.compose.tv.widget.LoadingScreen
 import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
+import com.muedsa.compose.tv.widget.LocalRightSideDrawerState
+import com.muedsa.compose.tv.widget.NoBackground
 import com.muedsa.compose.tv.widget.ScreenBackground
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.compose.tv.widget.StandardImageCardsRow
+import com.muedsa.compose.tv.widget.TwoSideWideButton
 import com.muedsa.compose.tv.widget.rememberScreenBackgroundState
 import com.muedsa.uitl.LogUtil
 import kotlinx.coroutines.flow.update
@@ -79,6 +87,7 @@ fun AnimeDetailScreen(
     val screenWidth = configuration.screenWidthDp.dp
     val lifecycleOwner = LocalLifecycleOwner.current
     val errorMsgBoxState = LocalErrorMsgBoxState.current
+    val rightSideDrawerState = LocalRightSideDrawerState.current
 
     val animeDetailLD by viewModel.animeDetailLDSF.collectAsState()
     val favoriteModel by viewModel.favoriteModelSF.collectAsState()
@@ -241,29 +250,72 @@ fun AnimeDetailScreen(
 
                 // 按钮列表
                 item {
-
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         // 切换播放源
+                        val currentSourceName = animeDetail.playerLabelArr.getOrDefault(
+                            selectedPlaySource,
+                            "Unknown"
+                        ) + if (animeDetail.isVip(selectedPlaySource)) "*" else " "
                         Text(
-                            text = "播放源",
+                            text = "播放源: $currentSourceName",
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.titleMedium
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        ExposedDropdownMenuButton(
-                            itemList = info.playLists.keys.toList(),
-                            textFn = { _, item ->
-                                animeDetail.playerLabelArr.getOrDefault(
-                                    item,
-                                    "Unknown"
-                                ) + if (animeDetail.isVip(item)) "*" else " "
-                            },
-                            onSelected = { _, item ->
-                                selectedPlaySource = item
-                                selectedPlaySourceList = info.playLists[item]!!
+                        OutlinedIconButton(onClick = {
+                            rightSideDrawerState.pop {
+                                Column {
+                                    Text(
+                                        modifier = Modifier
+                                            .padding(start = 8.dp, end = 15.dp),
+                                        text = "弹幕剧集",
+                                        style = MaterialTheme.typography.titleLarge
+                                    )
+                                    TvLazyColumn(
+                                        contentPadding = PaddingValues(vertical = 20.dp)
+                                    ) {
+                                        items(items = info.playLists.keys.toList()) {
+                                            val interactionSource =
+                                                remember { MutableInteractionSource() }
+                                            TwoSideWideButton(
+                                                title = {
+                                                    Text(
+                                                        text = animeDetail.playerLabelArr.getOrDefault(
+                                                            it,
+                                                            "Unknown"
+                                                        ) + if (animeDetail.isVip(it)) "*" else " "
+                                                    )
+                                                },
+                                                onClick = {
+                                                    rightSideDrawerState.close()
+                                                    selectedPlaySource = it
+                                                    selectedPlaySourceList = info.playLists[it]!!
+                                                },
+                                                interactionSource = interactionSource,
+                                                background = {
+                                                    WideButtonDefaults.NoBackground(
+                                                        interactionSource = interactionSource
+                                                    )
+                                                }
+                                            ) {
+                                                RadioButton(
+                                                    selected = selectedPlaySource == it,
+                                                    onClick = { },
+                                                    interactionSource = interactionSource
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                        )
+                        }) {
+                            Icon(
+                                imageVector = Icons.Outlined.Edit,
+                                contentDescription = "修改播放源"
+                            )
+                        }
 
+                        // 收藏按钮
                         Spacer(modifier = Modifier.width(25.dp))
                         OutlinedButton(onClick = {
                             if (favoriteModel == null) {
@@ -285,45 +337,96 @@ fun AnimeDetailScreen(
                             Icon(
                                 imageVector = Icons.Outlined.Favorite,
                                 contentDescription = "收藏",
-                                tint = if (favoriteModel == null) FavoriteIconColor else LocalContentColor.current
+                                tint = if (favoriteModel == null) LocalContentColor.current else FavoriteIconColor
                             )
                         }
 
-                        // 开启弹幕按钮
+                        // 切换弹弹Play匹配剧集
                         if (danAnimeInfoLD.type == LazyType.SUCCESS && danAnimeInfoLD.data != null) {
+                            val danAnimeInfo = danAnimeInfoLD.data
                             Spacer(modifier = Modifier.width(25.dp))
                             Text(
-                                text = "弹幕",
+                                text = "弹弹Play匹配剧集: ${if (enabledDanmaku) danAnimeInfo?.animeTitle ?: "--" else "关闭"}",
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleMedium
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            FocusScaleSwitch(
-                                checked = enabledDanmaku,
-                                onCheckedChange = { enabledDanmaku = it }
-                            )
                         }
-
-                        // 弹弹Play数据
                         if (danSearchAnimeListLD.type == LazyType.SUCCESS && !danSearchAnimeListLD.data.isNullOrEmpty()) {
-                            Spacer(modifier = Modifier.width(25.dp))
-                            Text(
-                                text = "匹配弹弹Play",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                style = MaterialTheme.typography.titleMedium
-                            )
+                            val danSearchAnimeList = danSearchAnimeListLD.data!!
                             Spacer(modifier = Modifier.width(8.dp))
-                            ExposedDropdownMenuButton(
-                                itemList = danSearchAnimeListLD.data!!,
-                                textFn = { _, item ->
-                                    item.animeTitle
-                                },
-                                onSelected = { _, item ->
-                                    viewModel.danBangumi(item.animeId)
+                            OutlinedIconButton(onClick = {
+                                rightSideDrawerState.pop {
+                                    Column {
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(start = 8.dp, end = 15.dp),
+                                            text = "弹幕剧集",
+                                            style = MaterialTheme.typography.titleLarge
+                                        )
+                                        TvLazyColumn(
+                                            contentPadding = PaddingValues(vertical = 20.dp)
+                                        ) {
+                                            item {
+                                                val interactionSource =
+                                                    remember { MutableInteractionSource() }
+                                                TwoSideWideButton(
+                                                    title = { Text("关闭弹幕") },
+                                                    onClick = {
+                                                        rightSideDrawerState.close()
+                                                        enabledDanmaku = false
+                                                    },
+                                                    interactionSource = interactionSource,
+                                                    background = {
+                                                        WideButtonDefaults.NoBackground(
+                                                            interactionSource = interactionSource
+                                                        )
+                                                    }
+                                                ) {
+                                                    RadioButton(
+                                                        selected = !enabledDanmaku,
+                                                        onClick = { },
+                                                        interactionSource = interactionSource
+                                                    )
+                                                }
+                                            }
+                                            items(items = danSearchAnimeList) {
+                                                val interactionSource =
+                                                    remember { MutableInteractionSource() }
+                                                TwoSideWideButton(
+                                                    title = { Text(it.animeTitle) },
+                                                    subtitle = { Text(it.startDate) },
+                                                    onClick = {
+                                                        rightSideDrawerState.close()
+                                                        enabledDanmaku = true
+                                                        viewModel.danBangumi(it.animeId)
+                                                    },
+                                                    interactionSource = interactionSource,
+                                                    background = {
+                                                        WideButtonDefaults.NoBackground(
+                                                            interactionSource = interactionSource
+                                                        )
+                                                    }
+                                                ) {
+                                                    RadioButton(
+                                                        selected = enabledDanmaku
+                                                                && danAnimeInfoLD.data?.animeId == it.animeId,
+                                                        onClick = { },
+                                                        interactionSource = interactionSource
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-                            )
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Edit,
+                                    contentDescription = "修改弹弹Play匹配剧集"
+                                )
+                            }
                         }
 
+                        // 设置按钮
                         Spacer(modifier = Modifier.width(25.dp))
                         OutlinedButton(
                             onClick = {

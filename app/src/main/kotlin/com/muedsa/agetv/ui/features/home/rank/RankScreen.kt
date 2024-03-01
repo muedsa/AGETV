@@ -1,17 +1,20 @@
 package com.muedsa.agetv.ui.features.home.rank
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,17 +24,23 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.foundation.lazy.list.TvLazyColumn
 import androidx.tv.foundation.lazy.list.items
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.OutlinedIconButton
+import androidx.tv.material3.RadioButton
 import androidx.tv.material3.Text
+import androidx.tv.material3.WideButtonDefaults
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.model.age.AgeCatalogOption
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.RankViewModel
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
 import com.muedsa.compose.tv.widget.ErrorScreen
-import com.muedsa.compose.tv.widget.ExposedDropdownMenuButton
 import com.muedsa.compose.tv.widget.LoadingScreen
 import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
+import com.muedsa.compose.tv.widget.LocalRightSideDrawerState
+import com.muedsa.compose.tv.widget.NoBackground
+import com.muedsa.compose.tv.widget.TwoSideWideButton
 import com.muedsa.uitl.LogUtil
 import kotlinx.coroutines.flow.update
 
@@ -42,6 +51,7 @@ fun RankScreen(
     onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
 ) {
     val errorMsgBoxState = LocalErrorMsgBoxState.current
+    val rightSideDrawerState = LocalRightSideDrawerState.current
 
     val selectYear by viewModel.selectedYearSF.collectAsState()
     val rankLD by viewModel.rankLDSF.collectAsState()
@@ -55,25 +65,51 @@ fun RankScreen(
     Column(modifier = Modifier.padding(start = ScreenPaddingLeft)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = "首播年份",
+                text = "首播年份: ${selectYear.text}",
                 color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.width(8.dp))
-            ExposedDropdownMenuButton(
-                selectedIndexState = remember {
-                    mutableIntStateOf(AgeCatalogOption.Years.indexOf(selectYear))
-                },
-                itemList = AgeCatalogOption.Years,
-                textFn = { _, item ->
-                    item.text
-                },
-                onSelected = { _, item ->
-                    viewModel.selectedYearSF.update {
-                        item
+            OutlinedIconButton(onClick = {
+                rightSideDrawerState.pop {
+                    Column {
+                        Text(
+                            modifier = Modifier
+                                .padding(start = 8.dp, end = 15.dp),
+                            text = "年份",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        TvLazyColumn(
+                            contentPadding = PaddingValues(vertical = 20.dp)
+                        ) {
+                            items(items = AgeCatalogOption.Years) {
+                                val interactionSource = remember { MutableInteractionSource() }
+                                TwoSideWideButton(
+                                    title = { Text(text = it.text) },
+                                    onClick = {
+                                        rightSideDrawerState.close()
+                                        viewModel.selectedYearSF.update { it }
+                                    },
+                                    interactionSource = interactionSource,
+                                    background = {
+                                        WideButtonDefaults.NoBackground(
+                                            interactionSource = interactionSource
+                                        )
+                                    }
+                                ) {
+                                    RadioButton(
+                                        selected = selectYear == it,
+                                        onClick = { },
+                                        interactionSource = interactionSource
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
-            )
+            }) {
+                Icon(imageVector = Icons.Outlined.MoreVert, contentDescription = "修改首播年份")
+            }
         }
         if (rankLD.type == LazyType.SUCCESS && !rankLD.data.isNullOrEmpty() && rankLD.data!!.size > 2) {
             val dayList = rankLD.data!![0]

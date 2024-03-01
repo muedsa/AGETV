@@ -1,17 +1,28 @@
 package com.muedsa.agetv.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.navArgument
 import com.muedsa.agetv.ui.features.detail.AnimeDetailScreen
 import com.muedsa.agetv.ui.features.home.HomeNavScreen
 import com.muedsa.agetv.ui.features.setting.AppSettingScreen
+import com.muedsa.compose.tv.widget.FullWidthDialogProperties
+import com.muedsa.compose.tv.widget.LocalRightSideDrawerState
 import com.muedsa.compose.tv.widget.NotFoundScreen
+import com.muedsa.compose.tv.widget.RightSideDrawerWithNavDrawerContent
+import com.muedsa.compose.tv.widget.RightSideDrawerWithNavState
+
+val LocalAppNavController = compositionLocalOf<NavHostController> {
+    error("LocalAppNavController not init")
+}
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -20,49 +31,69 @@ fun AppNavigation(navController: NavHostController) {
         "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
     }
 
-    NavHost(
-        navController = navController,
-        startDestination = buildRoute(NavigationItems.Home, listOf("0"))
+    val rightSideDrawerState =
+        RightSideDrawerWithNavState(navController, NavigationItems.RightSideDrawer.path)
+
+    CompositionLocalProvider(
+        LocalAppNavController provides navController,
+        LocalRightSideDrawerState provides rightSideDrawerState
     ) {
-
-        composable(
-            route = NavigationItems.Home.path,
-            arguments = listOf(navArgument("tabIndex") {
-                type = NavType.IntType
-            })
+        NavHost(
+            navController = navController,
+            startDestination = buildRoute(NavigationItems.Home, listOf("0"))
         ) {
-            HomeNavScreen(
-                tabIndex = checkNotNull(it.arguments?.getInt("tabIndex")),
-                homePageViewModel = hiltViewModel(viewModelStoreOwner),
-                onNavigate = { navItem, pathParams ->
-                    onNavigate(navController, navItem, pathParams)
-                }
-            )
-        }
 
-        composable(
-            route = NavigationItems.Detail.path,
-            arguments = listOf(navArgument("animeId") {
-                type = NavType.StringType
-            })
-        ) {
-            AnimeDetailScreen(
-                onNavigate = { navItem, pathParams ->
-                    onNavigate(navController, navItem, pathParams)
-                }
-            )
-        }
+            composable(
+                route = NavigationItems.Home.path,
+                arguments = listOf(navArgument("tabIndex") {
+                    type = NavType.IntType
+                })
+            ) {
+                HomeNavScreen(
+                    tabIndex = checkNotNull(it.arguments?.getInt("tabIndex")),
+                    homePageViewModel = hiltViewModel(viewModelStoreOwner),
+                    onNavigate = { navItem, pathParams ->
+                        onNavigate(navController, navItem, pathParams)
+                    }
+                )
+            }
 
-        composable(
-            route = NavigationItems.Setting.path
-        ) {
-            AppSettingScreen()
-        }
+            composable(
+                route = NavigationItems.Detail.path,
+                arguments = listOf(navArgument("animeId") {
+                    type = NavType.StringType
+                })
+            ) {
+                AnimeDetailScreen(
+                    onNavigate = { navItem, pathParams ->
+                        onNavigate(navController, navItem, pathParams)
+                    }
+                )
+            }
 
-        composable(NavigationItems.NotFound.path) {
-            NotFoundScreen()
+            dialog(
+                route = NavigationItems.Setting.path,
+                dialogProperties = FullWidthDialogProperties()
+            ) {
+                AppSettingScreen()
+            }
+
+            composable(NavigationItems.NotFound.path) {
+                NotFoundScreen()
+            }
+
+            dialog(
+                route = NavigationItems.RightSideDrawer.path,
+                dialogProperties = FullWidthDialogProperties()
+            ) {
+                RightSideDrawerWithNavDrawerContent(
+                    state = rightSideDrawerState
+                )
+            }
         }
     }
+
+
 }
 
 fun buildRoute(

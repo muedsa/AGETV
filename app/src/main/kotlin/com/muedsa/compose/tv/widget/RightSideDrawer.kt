@@ -37,21 +37,21 @@ fun RightSideDrawer(
                     state.close()
                 }
                 if (it == DrawerValue.Open) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(all = 24.dp),
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Surface(
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        Column(
                             modifier = Modifier
-                                .fillMaxHeight(),
-                            colors = NonInteractiveSurfaceDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                                contentColor = MaterialTheme.colorScheme.onSurface
-                            )
+                                .fillMaxHeight()
+                                .padding(all = 24.dp),
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxHeight(),
+                                colors = NonInteractiveSurfaceDefaults.colors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                    contentColor = MaterialTheme.colorScheme.onSurface
+                                )
+                            ) {
                                 Box(
                                     Modifier
                                         .fillMaxHeight()
@@ -79,7 +79,7 @@ fun RightSideDrawer(
 
 
 @OptIn(ExperimentalTvMaterial3Api::class)
-class RightSideDrawerState {
+open class RightSideDrawerState {
     private val contentState: MutableState<@Composable () -> Unit> = mutableStateOf({})
     val drawerState: DrawerState = DrawerState(DrawerValue.Closed)
 
@@ -88,12 +88,12 @@ class RightSideDrawerState {
         contentState.value.invoke()
     }
 
-    fun pop(content: @Composable () -> Unit) {
+    open fun pop(content: @Composable () -> Unit) {
         contentState.value = content
         drawerState.setValue(DrawerValue.Open)
     }
 
-    fun close() {
+    open fun close() {
         drawerState.setValue(DrawerValue.Closed)
     }
 }

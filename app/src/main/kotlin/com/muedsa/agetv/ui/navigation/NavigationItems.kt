@@ -11,4 +11,6 @@ sealed class NavigationItems(
     data object Setting : NavigationItems("setting")
 
     data object NotFound : NavigationItems("not_found")
+
+    data object RightSideDrawer : NavigationItems("right_side_drawer")
 }

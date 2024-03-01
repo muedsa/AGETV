@@ -21,6 +21,10 @@ val LocalRightSideDrawerState = compositionLocalOf<RightSideDrawerState> {
     error("LocalRightSideDrawerState not init")
 }
 
+val LocalAppNavCtrl = compositionLocalOf<RightSideDrawerState> {
+    error("LocalRightSideDrawerState not init")
+}
+
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun Scaffold(

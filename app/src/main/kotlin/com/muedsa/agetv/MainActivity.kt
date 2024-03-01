@@ -29,9 +29,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             TvTheme {
                 Scaffold {
-                    AppNavigation(
-                        navController = rememberNavController()
-                    )
+                    AppNavigation(navController = rememberNavController())
                 }
             }
         }
