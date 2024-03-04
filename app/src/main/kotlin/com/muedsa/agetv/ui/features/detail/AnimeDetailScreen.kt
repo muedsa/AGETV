@@ -1,6 +1,8 @@
 package com.muedsa.agetv.ui.features.detail
 
 import android.content.Intent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Favorite
@@ -77,7 +80,7 @@ import com.muedsa.compose.tv.widget.rememberScreenBackgroundState
 import com.muedsa.uitl.LogUtil
 import kotlinx.coroutines.flow.update
 
-@OptIn(ExperimentalTvMaterial3Api::class)
+@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AnimeDetailScreen(
     viewModel: AnimeDetailViewModel = hiltViewModel()
@@ -348,7 +351,16 @@ fun AnimeDetailScreen(
                             val danAnimeInfo = danAnimeInfoLD.data
                             Spacer(modifier = Modifier.width(25.dp))
                             Text(
-                                text = "弹弹Play匹配剧集: ${if (enabledDanmaku) danAnimeInfo?.animeTitle ?: "--" else "关闭"}",
+                                text = "弹弹Play匹配剧集: ",
+                                color = MaterialTheme.colorScheme.onBackground,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .widthIn(max = 128.dp)
+                                    .basicMarquee(),
+                                text = if (enabledDanmaku) danAnimeInfo?.animeTitle
+                                    ?: "--" else "关闭",
                                 color = MaterialTheme.colorScheme.onBackground,
                                 style = MaterialTheme.typography.titleMedium
                             )

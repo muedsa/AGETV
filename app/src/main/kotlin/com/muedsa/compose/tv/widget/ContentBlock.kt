@@ -1,5 +1,7 @@
 package com.muedsa.compose.tv.widget
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +16,7 @@ import androidx.tv.material3.Text
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.TvTheme
 
-@OptIn(ExperimentalTvMaterial3Api::class)
+@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ContentBlock(
     modifier: Modifier = Modifier,
@@ -41,7 +43,9 @@ fun ContentBlock(
                 )
             }
             Text(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .basicMarquee(),
                 text = model.title,
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.headlineLarge,
@@ -62,7 +66,9 @@ fun ContentBlock(
             }
         } else if (ContentBlockType.CARD == type) {
             Text(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .basicMarquee(),
                 text = model.title,
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
