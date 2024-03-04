@@ -25,7 +25,9 @@ import androidx.tv.material3.MaterialTheme
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.ui.AgePosterSize
 import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
+import com.muedsa.agetv.ui.navigation.LocalAppNavController
 import com.muedsa.agetv.ui.navigation.NavigationItems
+import com.muedsa.agetv.ui.navigation.navigate
 import com.muedsa.agetv.viewmodel.HomePageViewModel
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
@@ -43,14 +45,14 @@ import com.muedsa.uitl.LogUtil
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun MainScreen(
-    viewModel: HomePageViewModel = hiltViewModel(),
-    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
+    viewModel: HomePageViewModel = hiltViewModel()
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
     val screenWidth = configuration.screenWidthDp.dp
     val backgroundState = LocalHomeScreenBackgroundState.current
     val errorMsgBoxState = LocalErrorMsgBoxState.current
+    val navController = LocalAppNavController.current
 
     val homeData by viewModel.homeDataSF.collectAsState()
 
@@ -127,7 +129,10 @@ fun MainScreen(
                                 },
                                 onItemClick = { _, anime ->
                                     LogUtil.d("Click $anime")
-                                    onNavigate(NavigationItems.Detail, listOf(anime.aid.toString()))
+                                    navController.navigate(
+                                        NavigationItems.Detail,
+                                        listOf(anime.aid.toString())
+                                    )
                                 }
                             )
                         }
@@ -154,7 +159,10 @@ fun MainScreen(
                         },
                         onItemClick = { _, anime ->
                             LogUtil.d("Click $anime")
-                            onNavigate(NavigationItems.Detail, listOf(anime.aid.toString()))
+                            navController.navigate(
+                                NavigationItems.Detail,
+                                listOf(anime.aid.toString())
+                            )
                         }
                     )
                 }
@@ -163,7 +171,7 @@ fun MainScreen(
                 item {
                     WeekAnimeListWidget(model = weekList) { _, _, item ->
                         LogUtil.d("Click $item")
-                        onNavigate(NavigationItems.Detail, listOf(item.id.toString()))
+                        navController.navigate(NavigationItems.Detail, listOf(item.id.toString()))
                     }
                 }
 

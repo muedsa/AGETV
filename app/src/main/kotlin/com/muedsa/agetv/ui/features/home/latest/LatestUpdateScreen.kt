@@ -32,7 +32,9 @@ import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.ui.AgePosterSize
 import com.muedsa.agetv.ui.GirdLastItemHeight
 import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
+import com.muedsa.agetv.ui.navigation.LocalAppNavController
 import com.muedsa.agetv.ui.navigation.NavigationItems
+import com.muedsa.agetv.ui.navigation.navigate
 import com.muedsa.agetv.viewmodel.LatestUpdateViewModel
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
@@ -46,9 +48,9 @@ import com.muedsa.uitl.LogUtil
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTvMaterial3Api::class)
 @Composable
 fun LatestUpdateScreen(
-    viewModel: LatestUpdateViewModel = hiltViewModel(),
-    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
+    viewModel: LatestUpdateViewModel = hiltViewModel()
 ) {
+    val navController = LocalAppNavController.current
     val backgroundState = LocalHomeScreenBackgroundState.current
     val errorMsgBoxState = LocalErrorMsgBoxState.current
 
@@ -115,7 +117,7 @@ fun LatestUpdateScreen(
                     },
                     onItemClick = {
                         LogUtil.d("Click $item")
-                        onNavigate(NavigationItems.Detail, listOf(item.aid.toString()))
+                        navController.navigate(NavigationItems.Detail, listOf(item.aid.toString()))
                     }
                 )
 

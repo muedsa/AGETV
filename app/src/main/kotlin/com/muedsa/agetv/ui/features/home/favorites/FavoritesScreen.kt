@@ -33,7 +33,9 @@ import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
 import com.muedsa.agetv.ui.AgePosterSize
 import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
+import com.muedsa.agetv.ui.navigation.LocalAppNavController
 import com.muedsa.agetv.ui.navigation.NavigationItems
+import com.muedsa.agetv.ui.navigation.navigate
 import com.muedsa.agetv.viewmodel.FavoriteViewModel
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
@@ -46,9 +48,9 @@ import com.muedsa.uitl.LogUtil
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun FavoritesScreen(
-    viewModel: FavoriteViewModel = hiltViewModel(),
-    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
+    viewModel: FavoriteViewModel = hiltViewModel()
 ) {
+    val navController = LocalAppNavController.current
     val backgroundState = LocalHomeScreenBackgroundState.current
 
     val favoriteAnimeList by viewModel.favoriteAnimeSF.collectAsState()
@@ -118,7 +120,10 @@ fun FavoritesScreen(
                             }
                             viewModel.remove(item)
                         } else {
-                            onNavigate(NavigationItems.Detail, listOf(item.id.toString()))
+                            navController.navigate(
+                                NavigationItems.Detail,
+                                listOf(item.id.toString())
+                            )
                         }
                     }
                 )

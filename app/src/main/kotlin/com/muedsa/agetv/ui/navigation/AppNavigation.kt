@@ -52,9 +52,6 @@ fun AppNavigation(navController: NavHostController) {
                 HomeNavScreen(
                     tabIndex = checkNotNull(it.arguments?.getInt("tabIndex")),
                     homePageViewModel = hiltViewModel(viewModelStoreOwner),
-                    onNavigate = { navItem, pathParams ->
-                        onNavigate(navController, navItem, pathParams)
-                    }
                 )
             }
 
@@ -64,11 +61,7 @@ fun AppNavigation(navController: NavHostController) {
                     type = NavType.StringType
                 })
             ) {
-                AnimeDetailScreen(
-                    onNavigate = { navItem, pathParams ->
-                        onNavigate(navController, navItem, pathParams)
-                    }
-                )
+                AnimeDetailScreen()
             }
 
             dialog(
@@ -111,10 +104,9 @@ fun buildRoute(
     return route
 }
 
-fun onNavigate(
-    navController: NavHostController,
+fun NavHostController.navigate(
     navItem: NavigationItems,
     pathParams: List<String>?
 ) {
-    navController.navigate(buildRoute(navItem, pathParams))
+    navigate(buildRoute(navItem, pathParams))
 }

@@ -55,7 +55,9 @@ import com.muedsa.agetv.ui.AgePosterSize
 import com.muedsa.agetv.ui.FavoriteIconColor
 import com.muedsa.agetv.ui.RankFontColor
 import com.muedsa.agetv.ui.RankIconColor
+import com.muedsa.agetv.ui.navigation.LocalAppNavController
 import com.muedsa.agetv.ui.navigation.NavigationItems
+import com.muedsa.agetv.ui.navigation.navigate
 import com.muedsa.agetv.viewmodel.AnimeDetailViewModel
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
@@ -78,8 +80,7 @@ import kotlinx.coroutines.flow.update
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun AnimeDetailScreen(
-    viewModel: AnimeDetailViewModel = hiltViewModel(),
-    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
+    viewModel: AnimeDetailViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
@@ -88,6 +89,7 @@ fun AnimeDetailScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val errorMsgBoxState = LocalErrorMsgBoxState.current
     val rightSideDrawerState = LocalRightSideDrawerState.current
+    val navController = LocalAppNavController.current
 
     val animeDetailLD by viewModel.animeDetailLDSF.collectAsState()
     val favoriteModel by viewModel.favoriteModelSF.collectAsState()
@@ -430,7 +432,7 @@ fun AnimeDetailScreen(
                         Spacer(modifier = Modifier.width(25.dp))
                         OutlinedButton(
                             onClick = {
-                                onNavigate(NavigationItems.Setting, null)
+                                navController.navigate(NavigationItems.Setting, null)
                             }
                         ) {
                             Text(text = "设置")

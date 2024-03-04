@@ -24,7 +24,9 @@ import androidx.tv.material3.Text
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.ui.AgePosterSize
 import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
+import com.muedsa.agetv.ui.navigation.LocalAppNavController
 import com.muedsa.agetv.ui.navigation.NavigationItems
+import com.muedsa.agetv.ui.navigation.navigate
 import com.muedsa.agetv.viewmodel.RecommendViewModel
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
@@ -41,11 +43,11 @@ import com.muedsa.uitl.LogUtil
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTvMaterial3Api::class)
 @Composable
 fun RecommendScreen(
-    viewModel: RecommendViewModel = hiltViewModel(),
-    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
+    viewModel: RecommendViewModel = hiltViewModel()
 ) {
     val backgroundState = LocalHomeScreenBackgroundState.current
     val errorMsgBoxState = LocalErrorMsgBoxState.current
+    val navController = LocalAppNavController.current
 
     val recommendLD by viewModel.recommendLDSF.collectAsState()
 
@@ -108,7 +110,10 @@ fun RecommendScreen(
                             },
                             onItemClick = {
                                 LogUtil.d("Click $item")
-                                onNavigate(NavigationItems.Detail, listOf(item.aid.toString()))
+                                navController.navigate(
+                                    NavigationItems.Detail,
+                                    listOf(item.aid.toString())
+                                )
                             }
                         )
                     }

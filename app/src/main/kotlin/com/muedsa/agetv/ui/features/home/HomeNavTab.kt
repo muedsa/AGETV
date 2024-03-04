@@ -30,7 +30,6 @@ import com.muedsa.agetv.ui.features.home.main.MainScreen
 import com.muedsa.agetv.ui.features.home.rank.RankScreen
 import com.muedsa.agetv.ui.features.home.recommend.RecommendScreen
 import com.muedsa.agetv.ui.features.home.search.SearchScreen
-import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.viewmodel.HomePageViewModel
 import com.muedsa.compose.tv.widget.NotFoundScreen
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
@@ -51,8 +50,7 @@ val tabs = listOf(
 @Composable
 fun HomeNavTab(
     tabIndex: Int = 0,
-    homePageViewModel: HomePageViewModel,
-    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> },
+    homePageViewModel: HomePageViewModel
 ) {
     val backgroundState = LocalHomeScreenBackgroundState.current
     var focusedTabIndex by rememberSaveable { mutableIntStateOf(tabIndex) }
@@ -114,8 +112,7 @@ fun HomeNavTab(
         }
         HomeContent(
             tabIndex = tabPanelIndex,
-            homePageViewModel = homePageViewModel,
-            onNavigate = onNavigate
+            homePageViewModel = homePageViewModel
         )
     }
 }
@@ -123,26 +120,18 @@ fun HomeNavTab(
 @Composable
 fun HomeContent(
     tabIndex: Int,
-    homePageViewModel: HomePageViewModel,
-    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> },
+    homePageViewModel: HomePageViewModel
 ) {
     when (tabIndex) {
         0 -> MainScreen(
-            viewModel = homePageViewModel,
-            onNavigate = onNavigate
+            viewModel = homePageViewModel
         )
 
-        1 -> RankScreen(
-            onNavigate = onNavigate
-        )
+        1 -> RankScreen()
 
-        2 -> LatestUpdateScreen(
-            onNavigate = onNavigate
-        )
+        2 -> LatestUpdateScreen()
 
-        3 -> RecommendScreen(
-            onNavigate = onNavigate
-        )
+        3 -> RecommendScreen()
 
         4 -> SearchScreen()
 

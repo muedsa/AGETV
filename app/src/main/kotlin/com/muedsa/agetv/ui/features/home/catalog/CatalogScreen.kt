@@ -48,7 +48,9 @@ import com.muedsa.agetv.model.age.AgeCatalogOption
 import com.muedsa.agetv.ui.AgePosterSize
 import com.muedsa.agetv.ui.GirdLastItemHeight
 import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
+import com.muedsa.agetv.ui.navigation.LocalAppNavController
 import com.muedsa.agetv.ui.navigation.NavigationItems
+import com.muedsa.agetv.ui.navigation.navigate
 import com.muedsa.agetv.viewmodel.CatalogViewModel
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
@@ -62,9 +64,9 @@ import com.muedsa.uitl.LogUtil
 @OptIn(ExperimentalTvMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CatalogScreen(
-    viewModel: CatalogViewModel = hiltViewModel(),
-    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
+    viewModel: CatalogViewModel = hiltViewModel()
 ) {
+    val navController = LocalAppNavController.current
     val backgroundState = LocalHomeScreenBackgroundState.current
     val errorMsgBoxState = LocalErrorMsgBoxState.current
 
@@ -290,7 +292,10 @@ fun CatalogScreen(
                         },
                         onItemClick = {
                             LogUtil.d("Click $item")
-                            onNavigate(NavigationItems.Detail, listOf(item.id.toString()))
+                            navController.navigate(
+                                NavigationItems.Detail,
+                                listOf(item.id.toString())
+                            )
                         }
                     )
 

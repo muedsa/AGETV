@@ -32,7 +32,9 @@ import androidx.tv.material3.Text
 import androidx.tv.material3.WideButtonDefaults
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.model.age.AgeCatalogOption
+import com.muedsa.agetv.ui.navigation.LocalAppNavController
 import com.muedsa.agetv.ui.navigation.NavigationItems
+import com.muedsa.agetv.ui.navigation.navigate
 import com.muedsa.agetv.viewmodel.RankViewModel
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
 import com.muedsa.compose.tv.widget.ErrorScreen
@@ -47,11 +49,11 @@ import kotlinx.coroutines.flow.update
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun RankScreen(
-    viewModel: RankViewModel = hiltViewModel(),
-    onNavigate: (NavigationItems, List<String>?) -> Unit = { _, _ -> }
+    viewModel: RankViewModel = hiltViewModel()
 ) {
     val errorMsgBoxState = LocalErrorMsgBoxState.current
     val rightSideDrawerState = LocalRightSideDrawerState.current
+    val navController = LocalAppNavController.current
 
     val selectYear by viewModel.selectedYearSF.collectAsState()
     val rankLD by viewModel.rankLDSF.collectAsState()
@@ -134,7 +136,10 @@ fun RankScreen(
                                 model = it,
                                 onClick = {
                                     LogUtil.d("Click $it")
-                                    onNavigate(NavigationItems.Detail, listOf(it.aid.toString()))
+                                    navController.navigate(
+                                        NavigationItems.Detail,
+                                        listOf(it.aid.toString())
+                                    )
                                 }
                             )
                         }
@@ -162,7 +167,10 @@ fun RankScreen(
                                 model = it,
                                 onClick = {
                                     LogUtil.d("Click $it")
-                                    onNavigate(NavigationItems.Detail, listOf(it.aid.toString()))
+                                    navController.navigate(
+                                        NavigationItems.Detail,
+                                        listOf(it.aid.toString())
+                                    )
                                 }
                             )
                         }
@@ -191,7 +199,10 @@ fun RankScreen(
                                 model = it,
                                 onClick = {
                                     LogUtil.d("Click $it")
-                                    onNavigate(NavigationItems.Detail, listOf(it.aid.toString()))
+                                    navController.navigate(
+                                        NavigationItems.Detail,
+                                        listOf(it.aid.toString())
+                                    )
                                 }
                             )
                         }
