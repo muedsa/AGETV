@@ -22,12 +22,14 @@ import androidx.tv.foundation.lazy.list.TvLazyColumn
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.ImmersiveList
 import androidx.tv.material3.MaterialTheme
+import com.muedsa.agetv.Upscayl
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.ui.AgePosterSize
 import com.muedsa.agetv.ui.features.home.LocalHomeScreenBackgroundState
 import com.muedsa.agetv.ui.navigation.LocalAppNavController
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.ui.navigation.navigate
+import com.muedsa.agetv.viewmodel.AppSettingViewModel
 import com.muedsa.agetv.viewmodel.HomePageViewModel
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
@@ -45,7 +47,8 @@ import com.muedsa.uitl.LogUtil
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun MainScreen(
-    viewModel: HomePageViewModel = hiltViewModel()
+    viewModel: HomePageViewModel = hiltViewModel(),
+    appSettingViewModel: AppSettingViewModel = hiltViewModel()
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
@@ -55,6 +58,8 @@ fun MainScreen(
     val navController = LocalAppNavController.current
 
     val homeData by viewModel.homeDataSF.collectAsState()
+
+    val settingLD by appSettingViewModel.settingLDSF.collectAsState()
 
     var title by remember { mutableStateOf("") }
     var subTitle by remember { mutableStateOf<String?>(null) }
@@ -84,7 +89,11 @@ fun MainScreen(
                     val animeModel = latestList[0]
                     title = animeModel.title
                     subTitle = animeModel.newTitle
-                    backgroundState.url = animeModel.picSmall
+                    if (settingLD.data?.upscaylCoverImageEnable == true) {
+                        backgroundState.url = Upscayl.url(animeModel.picSmall)
+                    } else {
+                        backgroundState.url = animeModel.picSmall
+                    }
                     backgroundState.type = ScreenBackgroundType.SCRIM
                 }
             }
@@ -124,7 +133,11 @@ fun MainScreen(
                                 onItemFocus = { _, anime ->
                                     title = anime.title
                                     subTitle = anime.newTitle
-                                    backgroundState.url = anime.picSmall
+                                    if (settingLD.data?.upscaylCoverImageEnable == true) {
+                                        backgroundState.url = Upscayl.url(anime.picSmall)
+                                    } else {
+                                        backgroundState.url = anime.picSmall
+                                    }
                                     backgroundState.type = ScreenBackgroundType.SCRIM
                                 },
                                 onItemClick = { _, anime ->

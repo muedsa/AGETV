@@ -146,18 +146,18 @@ fun ScreenBackground(
 }
 
 @Stable
-class ScreenBackgroundState(
+open class ScreenBackgroundState(
     initUrl: String? = null,
     initType: ScreenBackgroundType = ScreenBackgroundType.BLUR,
     initHeaders: Map<String, String> = mapOf()
 ) {
-    var url by mutableStateOf(initUrl)
+    open var url by mutableStateOf(initUrl)
     var type by mutableStateOf(initType)
     val headers = mutableStateMapOf(*initHeaders.toList().toTypedArray())
 
     companion object {
-        private const val SAVER_KEY_URL = "SAVER_KEY_URL"
-        private const val SAVER_KEY_TYPE = "SAVER_KEY_TYPE"
+        const val SAVER_KEY_URL = "SAVER_KEY_URL"
+        const val SAVER_KEY_TYPE = "SAVER_KEY_TYPE"
 
         val Saver: Saver<ScreenBackgroundState, *> = mapSaver(
             save = {

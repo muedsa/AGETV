@@ -1,11 +1,12 @@
 package com.muedsa.agetv.ui.features.setting
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -64,55 +65,59 @@ fun AppSettingScreen(
                     contentColor = MaterialTheme.colorScheme.onSurface
                 )
             ) {
-                Box(
-                    Modifier
-                        .fillMaxHeight()
+                Column(
+                    modifier = Modifier
+                        .width(IntrinsicSize.Max)
                         .padding(all = 20.dp)
                 ) {
-                    Column {
+                    Text(
+                        text = "设置",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                    Spacer(modifier = Modifier.height(30.dp))
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
-                            modifier = Modifier.width(150.dp),
-                            text = "设置",
+                            text = "全局弹幕开关",
                             color = MaterialTheme.colorScheme.onBackground,
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.titleMedium
                         )
-                        Spacer(modifier = Modifier.height(30.dp))
+                        FocusScaleSwitch(
+                            checked = settingModel.danmakuEnable,
+                            onCheckedChange = {
+                                viewModel.changeDanmakuEnable(it)
+                            }
+                        )
+                    }
 
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "弹幕缩放",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(modifier = Modifier.width(20.dp))
                         Row(
-                            modifier = Modifier.padding(bottom = 20.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                modifier = Modifier.width(100.dp),
-                                text = "全局弹幕开关",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            FocusScaleSwitch(
-                                checked = settingModel.danmakuEnable,
-                                onCheckedChange = {
-                                    viewModel.changeDanmakuEnable(it)
-                                }
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier.padding(bottom = 20.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                modifier = Modifier.width(100.dp),
-                                text = "弹幕缩放",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-
                             OutlinedIconButton(onClick = {
                                 viewModel.changeDanmakuSizeScale(settingModel.danmakuSizeScale - 5)
                             }) {
                                 Icon(imageVector = Icons.Outlined.Remove, contentDescription = "-")
                             }
-
                             Text(
                                 modifier = Modifier.width(60.dp),
                                 text = "${settingModel.danmakuSizeScale}%",
@@ -120,26 +125,30 @@ fun AppSettingScreen(
                                 style = MaterialTheme.typography.titleMedium,
                                 textAlign = TextAlign.Center
                             )
-
                             OutlinedIconButton(onClick = {
                                 viewModel.changeDanmakuSizeScale(settingModel.danmakuSizeScale + 5)
                             }) {
                                 Icon(imageVector = Icons.Outlined.Add, contentDescription = "+")
                             }
                         }
+                    }
 
-
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "弹幕透明度",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(modifier = Modifier.width(20.dp))
                         Row(
-                            modifier = Modifier.padding(bottom = 20.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                modifier = Modifier.width(100.dp),
-                                text = "弹幕透明度",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-
                             OutlinedIconButton(onClick = {
                                 viewModel.changeDanmakuAlpha(settingModel.danmakuAlpha - 5)
                             }) {
@@ -160,24 +169,29 @@ fun AppSettingScreen(
                                 Icon(imageVector = Icons.Outlined.Add, contentDescription = "+")
                             }
                         }
+                    }
 
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "弹幕屏占比",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Spacer(modifier = Modifier.width(20.dp))
                         Row(
-                            modifier = Modifier.padding(bottom = 20.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                modifier = Modifier.width(100.dp),
-                                text = "弹幕屏占比",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-
                             OutlinedIconButton(onClick = {
                                 viewModel.changeDanmakuScreenPart(settingModel.danmakuScreenPart - 5)
                             }) {
                                 Icon(imageVector = Icons.Outlined.Remove, contentDescription = "-")
                             }
-
                             Text(
                                 modifier = Modifier.width(60.dp),
                                 text = "${settingModel.danmakuScreenPart}%",
@@ -185,13 +199,32 @@ fun AppSettingScreen(
                                 style = MaterialTheme.typography.titleMedium,
                                 textAlign = TextAlign.Center
                             )
-
                             OutlinedIconButton(onClick = {
                                 viewModel.changeDanmakuScreenPart(settingModel.danmakuScreenPart + 5)
                             }) {
                                 Icon(imageVector = Icons.Outlined.Add, contentDescription = "+")
                             }
                         }
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "UPSCAYL",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        FocusScaleSwitch(
+                            checked = settingModel.upscaylCoverImageEnable,
+                            onCheckedChange = {
+                                viewModel.changeUpscaylCoverImageEnable(it)
+                            }
+                        )
                     }
                 }
             }

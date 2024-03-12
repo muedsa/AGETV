@@ -52,6 +52,7 @@ import androidx.tv.material3.RadioButton
 import androidx.tv.material3.Text
 import androidx.tv.material3.WideButtonDefaults
 import com.muedsa.agetv.PlaybackActivity
+import com.muedsa.agetv.Upscayl
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.room.model.FavoriteAnimeModel
 import com.muedsa.agetv.ui.AgePosterSize
@@ -62,6 +63,7 @@ import com.muedsa.agetv.ui.navigation.LocalAppNavController
 import com.muedsa.agetv.ui.navigation.NavigationItems
 import com.muedsa.agetv.ui.navigation.navigate
 import com.muedsa.agetv.viewmodel.AnimeDetailViewModel
+import com.muedsa.agetv.viewmodel.AppSettingViewModel
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
 import com.muedsa.compose.tv.widget.ContentBlock
@@ -83,7 +85,8 @@ import kotlinx.coroutines.flow.update
 @OptIn(ExperimentalTvMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AnimeDetailScreen(
-    viewModel: AnimeDetailViewModel = hiltViewModel()
+    viewModel: AnimeDetailViewModel = hiltViewModel(),
+    appSettingViewModel: AppSettingViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
@@ -100,6 +103,8 @@ fun AnimeDetailScreen(
     val danSearchAnimeListLD by viewModel.danSearchAnimeListLDSF.collectAsState()
     val danAnimeInfoLD by viewModel.danAnimeInfoLDSF.collectAsState()
 
+    val settingLD by appSettingViewModel.settingLDSF.collectAsState()
+
     val episodeRelationMap = remember { mutableStateMapOf<String, Long>() }
 
     val backgroundState = rememberScreenBackgroundState(
@@ -111,7 +116,11 @@ fun AnimeDetailScreen(
             errorMsgBoxState.error(animeDetailLD.error)
         } else if (animeDetailLD.type == LazyType.SUCCESS) {
             if (animeDetailLD.data != null) {
-                backgroundState.url = animeDetailLD.data!!.video.cover
+                if (settingLD.data?.upscaylCoverImageEnable == true) {
+                    backgroundState.url = Upscayl.url(animeDetailLD.data!!.video.cover)
+                } else {
+                    backgroundState.url = animeDetailLD.data!!.video.cover
+                }
             }
         }
     }
