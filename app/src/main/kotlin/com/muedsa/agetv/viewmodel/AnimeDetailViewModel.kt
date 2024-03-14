@@ -42,6 +42,8 @@ class AnimeDetailViewModel @Inject constructor(
     private val _animeDetailLDSF = MutableStateFlow(LazyData.init<AnimeDetailPageModel>())
     val animeDetailLDSF: StateFlow<LazyData<AnimeDetailPageModel>> = _animeDetailLDSF
 
+    val danSearchTitleSF: MutableStateFlow<String?> = MutableStateFlow(null)
+
     private val _danSearchAnimeListLDSF = MutableStateFlow(LazyData.init<List<DanSearchAnime>>())
     val danSearchAnimeListLDSF: StateFlow<LazyData<List<DanSearchAnime>>> = _danSearchAnimeListLDSF
 
@@ -185,13 +187,17 @@ class AnimeDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _animeDetailLDSF.collectLatest {
                 if (it.type == LazyType.SUCCESS) {
-                    val title = it.data?.video?.name
-                    if (!title.isNullOrBlank()) {
-                        _danSearchAnimeListLDSF.value = LazyData.init()
-                        _danSearchAnimeListLDSF.value = withContext(Dispatchers.IO) {
-                            fetchSearchDanAnime(title)
-                        }
-                    }
+                    danSearchTitleSF.value = it.data?.video?.name
+
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            danSearchTitleSF.collectLatest {
+                if (!it.isNullOrBlank()) {
+                    _danSearchAnimeListLDSF.value = LazyData.init()
+                    _danSearchAnimeListLDSF.value = fetchSearchDanAnime(it)
                 }
             }
         }

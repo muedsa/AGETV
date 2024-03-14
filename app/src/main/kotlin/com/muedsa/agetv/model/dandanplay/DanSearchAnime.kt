@@ -14,4 +14,6 @@ data class DanSearchAnime(
     @SerialName("episodeCount") val episodeCount: Int,
     @SerialName("rating") val rating: Float,
     @SerialName("isFavorited") val isFavorited: Boolean
-)
+) {
+    val startOnlyDate: String by lazy { startDate.substringBefore("T") }
+}

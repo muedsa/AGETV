@@ -159,7 +159,7 @@ fun AnimeDetailScreen(
             var selectedPlaySource by remember { mutableStateOf(info.playLists.keys.first()) }
             var selectedPlaySourceList by remember { mutableStateOf(info.playLists[selectedPlaySource]!!) }
 
-            var enabledDanmaku by remember { mutableStateOf(true) }
+            val enabledDanmakuState = remember { mutableStateOf(true) }
 
             LaunchedEffect(key1 = animeDetailLD) {
                 if (selectedPlaySource != info.playLists.keys.first()) {
@@ -356,98 +356,26 @@ fun AnimeDetailScreen(
                         }
 
                         // 切换弹弹Play匹配剧集
-                        if (danAnimeInfoLD.type == LazyType.SUCCESS && danAnimeInfoLD.data != null) {
-                            val danAnimeInfo = danAnimeInfoLD.data
-                            Spacer(modifier = Modifier.width(25.dp))
-                            Text(
-                                text = "弹弹Play匹配剧集: ",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .widthIn(max = 128.dp)
-                                    .basicMarquee(),
-                                text = if (enabledDanmaku) danAnimeInfo?.animeTitle
-                                    ?: "--" else "关闭",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                        }
-                        if (danSearchAnimeListLD.type == LazyType.SUCCESS && !danSearchAnimeListLD.data.isNullOrEmpty()) {
-                            val danSearchAnimeList = danSearchAnimeListLD.data!!
-                            Spacer(modifier = Modifier.width(8.dp))
-                            OutlinedIconButton(onClick = {
-                                rightSideDrawerState.pop {
-                                    Column {
-                                        Text(
-                                            modifier = Modifier
-                                                .padding(start = 8.dp, end = 15.dp),
-                                            text = "弹幕剧集",
-                                            style = MaterialTheme.typography.titleLarge
-                                        )
-                                        TvLazyColumn(
-                                            contentPadding = PaddingValues(vertical = 20.dp)
-                                        ) {
-                                            item {
-                                                val interactionSource =
-                                                    remember { MutableInteractionSource() }
-                                                TwoSideWideButton(
-                                                    title = { Text("关闭弹幕") },
-                                                    onClick = {
-                                                        rightSideDrawerState.close()
-                                                        enabledDanmaku = false
-                                                    },
-                                                    interactionSource = interactionSource,
-                                                    background = {
-                                                        WideButtonDefaults.NoBackground(
-                                                            interactionSource = interactionSource
-                                                        )
-                                                    }
-                                                ) {
-                                                    RadioButton(
-                                                        selected = !enabledDanmaku,
-                                                        onClick = { },
-                                                        interactionSource = interactionSource
-                                                    )
-                                                }
-                                            }
-                                            items(items = danSearchAnimeList) {
-                                                val interactionSource =
-                                                    remember { MutableInteractionSource() }
-                                                TwoSideWideButton(
-                                                    title = { Text(it.animeTitle) },
-                                                    subtitle = { Text(it.startDate) },
-                                                    onClick = {
-                                                        rightSideDrawerState.close()
-                                                        enabledDanmaku = true
-                                                        viewModel.danBangumi(it.animeId)
-                                                    },
-                                                    interactionSource = interactionSource,
-                                                    background = {
-                                                        WideButtonDefaults.NoBackground(
-                                                            interactionSource = interactionSource
-                                                        )
-                                                    }
-                                                ) {
-                                                    RadioButton(
-                                                        selected = enabledDanmaku
-                                                                && danAnimeInfoLD.data?.animeId == it.animeId,
-                                                        onClick = { },
-                                                        interactionSource = interactionSource
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Edit,
-                                    contentDescription = "修改弹弹Play匹配剧集"
-                                )
-                            }
-                        }
+                        val danAnimeInfo = danAnimeInfoLD.data
+                        Spacer(modifier = Modifier.width(25.dp))
+                        Text(
+                            text = "弹弹Play匹配剧集: ",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            modifier = Modifier
+                                .widthIn(max = 128.dp)
+                                .basicMarquee(),
+                            text = if (enabledDanmakuState.value) danAnimeInfo?.animeTitle
+                                ?: "--" else "关闭",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        AnimeDanmakuSelectBtnWidget(
+                            enabledDanmakuState = enabledDanmakuState,
+                            viewModel = viewModel
+                        )
 
                         // 设置按钮
                         Spacer(modifier = Modifier.width(25.dp))
@@ -495,7 +423,7 @@ fun AnimeDetailScreen(
                                         PlaybackActivity.MEDIA_URL_KEY,
                                         it.realUrl
                                     )
-                                    if (enabledDanmaku && danEpisode != null) {
+                                    if (enabledDanmakuState.value && danEpisode != null) {
                                         intent.putExtra(
                                             PlaybackActivity.DAN_EPISODE_ID_KEY,
                                             danEpisode.episodeId
