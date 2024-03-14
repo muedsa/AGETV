@@ -2,6 +2,12 @@ package com.muedsa.agetv.model.age
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonTransformingSerializer
 
 @Serializable
 data class AnimeDetailModel(
@@ -33,7 +39,8 @@ data class AnimeDetailModel(
     val plotArr: List<String>,
 
     @SerialName("playlists")
-    val playLists: Map<String, List<List<String>>>,
+    @Serializable(with = PlayListsSerializer::class)
+    val rawPlayLists: List<Map<String, List<List<String>>>>,
 
     @SerialName("area")
     val area: String,
@@ -109,4 +116,26 @@ data class AnimeDetailModel(
 
     @SerialName("collect_cnt")
     val collectCnt: String
-)
+) {
+
+    val playLists: Map<String, List<List<String>>> by lazy {
+        rawPlayLists.firstOrNull() ?: emptyMap()
+    }
+
+    companion object {
+        object PlayListsSerializer :
+            JsonTransformingSerializer<List<Map<String, List<List<String>>>>>(
+                ListSerializer(
+                    MapSerializer(
+                        String.serializer(),
+                        ListSerializer(ListSerializer(String.serializer()))
+                    )
+                ),
+            ) {
+            override fun transformDeserialize(element: JsonElement): JsonElement =
+                if (element !is JsonArray) JsonArray(listOf(element)) else element
+        }
+    }
+}
+
+
