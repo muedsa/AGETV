@@ -1,4 +1,8 @@
-# AGETV
+<div align="center">
+  <img src="app/src/main/ic_launcher-playstore.png" width="128px" height="128px"/>
+  <h1>HATV</h1>
+</div>
+
 [![API](https://img.shields.io/badge/API-24%2B-yellow.svg?style=flat&logo=android)](https://developer.android.com/about/versions/nougat)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/m/muedsa/AGETV?logo=github)](https://github.com/muedsa/AGETV/commits/main)
 [![CodeFactor](https://www.codefactor.io/repository/github/muedsa/bilibililivetv/badge)](https://www.codefactor.io/repository/github/muedsa/AGETV)
