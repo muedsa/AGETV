@@ -1,6 +1,6 @@
 <div align="center">
   <img src="app/src/main/ic_launcher-playstore.png" width="128px" height="128px"/>
-  <h1>HATV</h1>
+  <h1>AGETV</h1>
 </div>
 
 [![API](https://img.shields.io/badge/API-24%2B-yellow.svg?style=flat&logo=android)](https://developer.android.com/about/versions/nougat)
