@@ -2,6 +2,8 @@ package com.muedsa.agetv.ui.features.detail
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Column
@@ -39,7 +41,7 @@ const val EpisodePageSize = 20
 val EpisodeProgressStrokeWidth = 12.dp
 val WideButtonCornerRadius = 12.dp
 
-@OptIn(ExperimentalTvMaterial3Api::class)
+@OptIn(ExperimentalTvMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EpisodeListWidget(
     modifier: Modifier = Modifier,
@@ -241,6 +243,7 @@ fun EpisodeListWidget(
                             items = danEpisodeList,
                             key = { _, item -> item.episodeId }
                         ) { danEpisodePartIndex, danEpisode ->
+                            val interactionSource = remember { MutableInteractionSource() }
                             WideButton(
                                 modifier = Modifier.padding(end = 12.dp),
                                 title = {
@@ -248,6 +251,16 @@ fun EpisodeListWidget(
                                         text = danEpisode.episodeTitle,
                                         overflow = TextOverflow.Ellipsis
                                     )
+                                },
+                                subtitle = {
+                                    val isFocused by interactionSource.collectIsFocusedAsState()
+                                    if (isFocused) {
+                                        Text(
+                                            modifier = Modifier.basicMarquee(),
+                                            text = "选此匹配: ${selectedEpisode[0]}",
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
                                 },
                                 onClick = {
                                     onChangeEpisodeRelation(listOf(selectedEpisode[0] to danEpisode))
@@ -266,7 +279,8 @@ fun EpisodeListWidget(
                                         }
                                     })
                                     changeDanEpisodeMode = false
-                                }
+                                },
+                                interactionSource = interactionSource
                             )
                         }
 
