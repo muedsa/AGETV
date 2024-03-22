@@ -16,3 +16,8 @@ A third party **android tv** client for a pirate anime video web.
 
 ## Preview
 [Screenshot](/screenshots/SCREENSHOT.md)  
+
+## Others
+- [JCYTV](https://github.com/muedsa/JCYTV)
+- [BilibiliLiveTV](https://github.com/muedsa/BilibiliLiveTV)
+- [HATV](https://github.com/muedsa/HATV)
