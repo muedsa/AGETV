@@ -44,7 +44,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 2
-        versionName = "0.0.1-alpha02"
+        versionName = "0.0.1-alpha03"
         archivesName = "AGETV"
     }
 
