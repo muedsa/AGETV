@@ -24,6 +24,7 @@ import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.viewmodel.PlaybackViewModel
 import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
 import com.muedsa.compose.tv.widget.player.DanmakuVideoPlayer
+import com.muedsa.compose.tv.widget.player.mergeDanmaku
 import com.muedsa.uitl.LogUtil
 import kotlinx.coroutines.delay
 import kotlin.math.max
@@ -130,7 +131,11 @@ fun PlaybackScreen(
             },
             danmakuPlayerInit = {
                 if (!danmakuListLD.data.isNullOrEmpty()) {
-                    updateData(danmakuListLD.data!!)
+                    var list = danmakuListLD.data!!
+                    if (danmakuSetting.danmakuMergeEnable) {
+                        list = list.mergeDanmaku(5000L, 60000L, 30)
+                    }
+                    updateData(list)
                 }
             }
         ) {
