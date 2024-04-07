@@ -194,7 +194,7 @@ class AgePlayerService {
     companion object {
         private var DEFAULT_RETROFIT: Retrofit? = null
         private var DEFAULT_VIP_API_SERVICE: AgeVipPlayerApiService? = null
-        private const val WASM_AES_KEY = "ni po jie ni nb "
+        private const val WASM_AES_KEY = "ni po jie ni ** "
         const val TIMEOUT_MS = 10 * 1000
 
         const val SUCCESS_CODE = 200

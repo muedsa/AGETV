@@ -43,8 +43,8 @@ android {
         applicationId = "com.muedsa.agetv"
         minSdk = 24
         targetSdk = 34
-        versionCode = 4
-        versionName = "0.0.1-alpha04"
+        versionCode = 5
+        versionName = "0.0.1-alpha05"
         archivesName = "AGETV"
     }
 
@@ -177,6 +177,8 @@ dependencies {
     implementation(libs.firebase.crashlytics)
 
     //implementation(libs.material.icons.extended)
+
+    testImplementation(libs.bcprov.jdk15to18)
 }
 
 ksp {

@@ -33,6 +33,7 @@ retrofit2 = "2.11.0"
 retrofit2-ktx-serialization = "1.0.0"
 okhttp3-logging = "4.12.0"
 room = "2.6.1"
+bcprov-jdk15to18 = "1.77"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -82,6 +83,7 @@ okhttp3-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor"
 room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+bcprov-jdk15to18 = { module = "org.bouncycastle:bcprov-jdk15to18", version.ref = "bcprov-jdk15to18" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
