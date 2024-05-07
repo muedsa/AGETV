@@ -146,6 +146,8 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation.compose)
 
+    implementation(libs.datastore.preferences)
+
     implementation(libs.coil)
     implementation(libs.coil.compose)
     implementation(libs.coil.transformers)
