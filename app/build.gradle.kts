@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import org.jetbrains.kotlin.incremental.createDirectory
 import java.io.FileInputStream
 import java.util.Properties
@@ -11,6 +10,7 @@ plugins {
     alias(libs.plugins.hiltAndroid)
     alias(libs.plugins.gmsGoogleService)
     alias(libs.plugins.firebaseCrashlytics)
+    alias(libs.plugins.compose.compiler)
 }
 
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
@@ -45,7 +45,6 @@ android {
         targetSdk = 34
         versionCode = 6
         versionName = "0.0.1-alpha06"
-        archivesName = "AGETV"
     }
 
     signingConfigs {
@@ -102,8 +101,8 @@ android {
         compose = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
+    composeCompiler {
+        enableStrongSkippingMode = true
     }
 
     packaging {
