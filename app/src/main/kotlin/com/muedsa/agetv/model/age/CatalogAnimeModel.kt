@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonNames
 
 @Serializable
-data class CatalogAnimeModel @OptIn(ExperimentalSerializationApi::class) constructor(
+@OptIn(ExperimentalSerializationApi::class)
+data class CatalogAnimeModel(
     @SerialName("id")
     val id: Int,
     @SerialName("name")
