@@ -5,11 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.compose.rememberNavController
-import androidx.tv.material3.ExperimentalTvMaterial3Api
 import com.muedsa.agetv.model.LazyType
-import com.muedsa.agetv.ui.navigation.AppNavigation
-import com.muedsa.agetv.viewmodel.HomePageViewModel
+import com.muedsa.agetv.screens.AppNavigation
+import com.muedsa.agetv.screens.home.main.MainScreenViewModel
 import com.muedsa.compose.tv.theme.TvTheme
 import com.muedsa.compose.tv.widget.Scaffold
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,19 +15,18 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val homePageViewModel: HomePageViewModel by viewModels()
+    private val mainScreenViewModel: MainScreenViewModel by viewModels()
 
-    @OptIn(ExperimentalTvMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition {
-            homePageViewModel.homeDataSF.value.type == LazyType.LOADING
+            mainScreenViewModel.homeDataSF.value.type == LazyType.LOADING
         }
         setContent {
             TvTheme {
                 Scaffold {
-                    AppNavigation(navController = rememberNavController())
+                    AppNavigation()
                 }
             }
         }

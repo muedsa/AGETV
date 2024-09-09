@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.incremental.createDirectory
+
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -10,29 +10,14 @@ plugins {
     alias(libs.plugins.hiltAndroid)
     alias(libs.plugins.gmsGoogleService)
     alias(libs.plugins.firebaseCrashlytics)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.androidRoom)
 }
 
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
 if (keystorePropertiesFile.exists() && keystorePropertiesFile.canRead()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-}
-
-val schemasDir: File = project.file("schemas")
-if (!schemasDir.exists()) {
-    schemasDir.createDirectory()
-}
-
-class RoomSchemaArgProvider(
-    @get:InputDirectory
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    val schemaDir: File
-) : CommandLineArgumentProvider {
-
-    override fun asArguments(): Iterable<String> {
-        return listOf("room.schemaLocation=${schemaDir.path}")
-    }
 }
 
 android {
@@ -111,9 +96,9 @@ android {
         }
     }
 
-//    testOptions {
-//        unitTests.isReturnDefaultValues = true
-//    }
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
 dependencies {
@@ -139,7 +124,6 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 
-    implementation(libs.tv.foundation)
     implementation(libs.tv.material)
 
     implementation(libs.navigation.compose)
@@ -183,5 +167,5 @@ dependencies {
 }
 
 ksp {
-    arg(RoomSchemaArgProvider(File(projectDir, "schemas")))
+    arg("room.generateKotlin", "true")
 }
