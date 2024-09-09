@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.OutlinedIconButton
@@ -40,9 +40,12 @@ fun EmptyDataScreen(model: Boolean = false) {
     FillTextScreen(context = "Empty(っ °Д °;)っ", model = model)
 }
 
-@OptIn(ExperimentalTvMaterial3Api::class)
+
 @Composable
-fun ErrorScreen(onRefresh: (() -> Unit)? = null) {
+fun ErrorScreen(
+    onError: (() -> Unit)? = null,
+    onRefresh: (() -> Unit)? = null
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -58,9 +61,15 @@ fun ErrorScreen(onRefresh: (() -> Unit)? = null) {
             }
         }
     }
+
+    if (onError != null) {
+        LaunchedEffect(key1 = Unit) {
+            onError.invoke()
+        }
+    }
 }
 
-@OptIn(ExperimentalTvMaterial3Api::class)
+
 @Composable
 fun FillTextScreen(context: String, model: Boolean = false) {
     var modifier = Modifier.fillMaxSize()

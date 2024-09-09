@@ -3,28 +3,22 @@ package com.muedsa.agetv
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.NonInteractiveSurfaceDefaults
-import androidx.tv.material3.Surface
-import com.muedsa.agetv.ui.features.playback.PlaybackScreen
+import androidx.tv.material3.SurfaceDefaults
+import com.muedsa.agetv.screens.playback.PlaybackScreen
 import com.muedsa.compose.tv.theme.TvTheme
+import com.muedsa.compose.tv.useLocalToastMsgBoxController
 import com.muedsa.compose.tv.widget.AppBackHandler
 import com.muedsa.compose.tv.widget.FillTextScreen
-import com.muedsa.compose.tv.widget.LocalErrorMsgBoxState
 import com.muedsa.compose.tv.widget.Scaffold
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class PlaybackActivity : ComponentActivity() {
 
-    @OptIn(ExperimentalTvMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -36,7 +30,7 @@ class PlaybackActivity : ComponentActivity() {
             TvTheme {
                 Scaffold(
                     holdBack = false,
-                    colors = NonInteractiveSurfaceDefaults.colors(
+                    colors = SurfaceDefaults.colors(
                         containerColor = Color.Black,
                         contentColor = MaterialTheme.colorScheme.onBackground
                     )
@@ -47,26 +41,20 @@ class PlaybackActivity : ComponentActivity() {
                         val backListeners = remember {
                             mutableStateListOf<() -> Unit>()
                         }
-                        val errorMsgBoxState = LocalErrorMsgBoxState.current
+                        val toastController = useLocalToastMsgBoxController()
                         AppBackHandler {
                             backListeners.forEach {
                                 it()
                             }
-                            errorMsgBoxState.error("再次点击返回键退出")
+                            toastController.warning("再次点击返回键退出")
                         }
-                        Surface(
-                            modifier = Modifier.fillMaxSize(),
-                            shape = RectangleShape,
-
-                            ) {
-                            PlaybackScreen(
-                                aid = aid,
-                                episodeTitle = episodeTitle,
-                                mediaUrl = mediaUrl,
-                                danEpisodeId = episodeId,
-                                backListeners = backListeners
-                            )
-                        }
+                        PlaybackScreen(
+                            aid = aid,
+                            episodeTitle = episodeTitle,
+                            mediaUrl = mediaUrl,
+                            danEpisodeId = episodeId,
+                            backListeners = backListeners
+                        )
                     }
                 }
             }

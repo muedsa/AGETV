@@ -17,24 +17,23 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.DrawerState
 import androidx.tv.material3.DrawerValue
-import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.ModalNavigationDrawer
-import androidx.tv.material3.NonInteractiveSurfaceDefaults
 import androidx.tv.material3.Surface
+import androidx.tv.material3.SurfaceDefaults
 import com.muedsa.compose.tv.theme.surfaceContainer
 
-@OptIn(ExperimentalTvMaterial3Api::class)
+
 @Composable
 fun RightSideDrawer(
-    state: RightSideDrawerState = RightSideDrawerState(),
+    controller: RightSideDrawerController = RightSideDrawerController(),
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         ModalNavigationDrawer(
             drawerContent = {
                 BackHandler(enabled = it == DrawerValue.Open) {
-                    state.close()
+                    controller.close()
                 }
                 if (it == DrawerValue.Open) {
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -47,7 +46,7 @@ fun RightSideDrawer(
                             Surface(
                                 modifier = Modifier
                                     .fillMaxHeight(),
-                                colors = NonInteractiveSurfaceDefaults.colors(
+                                colors = SurfaceDefaults.colors(
                                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                                     contentColor = MaterialTheme.colorScheme.onSurface
                                 )
@@ -56,14 +55,14 @@ fun RightSideDrawer(
                                     Modifier
                                         .fillMaxHeight()
                                         .padding(all = 20.dp)) {
-                                    state.ContentCompose()
+                                    controller.ContentCompose()
                                 }
                             }
                         }
                     }
                 }
             },
-            drawerState = state.drawerState,
+            drawerState = controller.drawerState,
             content = {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     Surface(
@@ -78,8 +77,7 @@ fun RightSideDrawer(
 }
 
 
-@OptIn(ExperimentalTvMaterial3Api::class)
-open class RightSideDrawerState {
+open class RightSideDrawerController {
     private val contentState: MutableState<@Composable () -> Unit> = mutableStateOf({})
     val drawerState: DrawerState = DrawerState(DrawerValue.Closed)
 
