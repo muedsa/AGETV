@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -380,6 +381,7 @@ fun AnimeDetailScreen(
                 // 剧集列表
                 item {
                     EpisodeListWidget(
+                        modifier = Modifier.testTag("animeDetailScreen_episodeListWidget"),
                         episodeList = selectedPlaySourceList,
                         danEpisodeList = danAnimeInfoLD.data?.episodes ?: emptyList(),
                         episodeProgressMap = watchedEpisodeTitleMap,

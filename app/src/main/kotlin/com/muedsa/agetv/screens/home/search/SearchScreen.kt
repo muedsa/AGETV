@@ -29,8 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.ButtonDefaults
@@ -87,6 +87,7 @@ fun SearchScreen(
         ) {
             OutlinedTextField(
                 modifier = Modifier
+                    .testTag("searchScreen_searchButton")
                     .fillMaxWidth(0.55f)
                     .background(
                         color = MaterialTheme.colorScheme.inverseOnSurface,
@@ -119,28 +120,13 @@ fun SearchScreen(
 
         if (searchAnimeLP.list.isNotEmpty()) {
 
-            val gridFocusRequester = remember { FocusRequester() }
-
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
                 contentPadding = PaddingValues(
                     top = ImageCardRowCardPadding,
                     bottom = ImageCardRowCardPadding
                 ),
-                modifier = Modifier
-                    .focusRequester(gridFocusRequester)
-                    .focusProperties {
-                        exit = { gridFocusRequester.saveFocusedChild(); FocusRequester.Default }
-                        enter = {
-                            if (gridFocusRequester.restoreFocusedChild()) {
-                                LogUtil.d("grid restoreFocusedChild")
-                                FocusRequester.Cancel
-                            } else {
-                                LogUtil.d("grid focused default child")
-                                FocusRequester.Default
-                            }
-                        }
-                    }
+                modifier = Modifier.testTag("searchScreen_grid")
             ) {
                 itemsIndexed(
                     items = searchAnimeLP.list,

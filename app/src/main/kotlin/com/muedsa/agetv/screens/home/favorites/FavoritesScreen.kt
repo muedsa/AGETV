@@ -70,9 +70,10 @@ fun FavoritesScreen(
                 style = MaterialTheme.typography.headlineMedium
             )
             Spacer(modifier = Modifier.width(30.dp))
-            OutlinedButton(onClick = {
-                deleteMode = !deleteMode
-            }) {
+            OutlinedButton(
+                modifier = Modifier.testTag("favoritesScreen_deleteModeButton"),
+                onClick = { deleteMode = !deleteMode }
+            ) {
                 Text(if (deleteMode) "退出" else "删除模式")
                 Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
                 Icon(
