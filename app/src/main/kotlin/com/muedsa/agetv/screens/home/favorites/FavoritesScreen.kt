@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.ButtonDefaults
@@ -83,6 +84,7 @@ fun FavoritesScreen(
 
         LazyVerticalGrid(
             modifier = Modifier
+                .testTag("favoritesScreen_grid")
                 .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp),
             columns = GridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
             contentPadding = PaddingValues(

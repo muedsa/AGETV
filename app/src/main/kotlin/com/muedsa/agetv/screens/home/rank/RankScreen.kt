@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -127,7 +128,7 @@ fun RankScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleLarge
                     )
-                    LazyColumn {
+                    LazyColumn(modifier = Modifier.testTag("rankScreen_col_week")) {
                         items(dayList) {
                             RankAnimeWidget(
                                 model = it,
@@ -158,7 +159,7 @@ fun RankScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleLarge
                     )
-                    LazyColumn {
+                    LazyColumn(modifier = Modifier.testTag("rankScreen_col_month")) {
                         items(weekList) {
                             RankAnimeWidget(
                                 model = it,
@@ -190,7 +191,7 @@ fun RankScreen(
                         style = MaterialTheme.typography.titleLarge
                     )
 
-                    LazyColumn {
+                    LazyColumn(modifier = Modifier.testTag("rankScreen_col_all")) {
                         items(totalList) {
                             RankAnimeWidget(
                                 model = it,

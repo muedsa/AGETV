@@ -20,8 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.Card
@@ -54,8 +54,6 @@ fun LatestUpdateScreen(
 
     val latestUpdateLP by viewModel.latestUpdateLPSF.collectAsState()
 
-    val gridFocusRequester = remember { FocusRequester() }
-
     LaunchedEffect(key1 = latestUpdateLP) {
         if (latestUpdateLP.type == LazyType.FAILURE) {
             toastController.error(latestUpdateLP.error)
@@ -71,20 +69,8 @@ fun LatestUpdateScreen(
 
         LazyVerticalGrid(
             modifier = Modifier
-                .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp)
-                .focusRequester(gridFocusRequester)
-                .focusProperties {
-                    exit = { gridFocusRequester.saveFocusedChild(); FocusRequester.Default }
-                    enter = {
-                        if (gridFocusRequester.restoreFocusedChild()) {
-                            LogUtil.d("grid restoreFocusedChild")
-                            FocusRequester.Cancel
-                        } else {
-                            LogUtil.d("grid focused default child")
-                            FocusRequester.Default
-                        }
-                    }
-                },
+                .testTag("latestUpdateScreen_grid")
+                .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp),
             columns = GridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
             contentPadding = PaddingValues(
                 top = ImageCardRowCardPadding,

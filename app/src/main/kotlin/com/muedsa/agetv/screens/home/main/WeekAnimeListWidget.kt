@@ -2,6 +2,8 @@ package com.muedsa.agetv.screens.home.main
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.muedsa.agetv.model.age.WeekAnimeModel
 import com.muedsa.agetv.theme.WeekCardColorList
 import com.muedsa.compose.tv.model.ContentModel
@@ -21,6 +23,7 @@ fun WeekAnimeListWidget(
             val dayList = model[key] ?: emptyList()
 
             ImageCardsRow(
+                modifier = Modifier.testTag("mainScreen_week_$index"),
                 title = "每周放送 · ${WeekNameList[index]}",
                 modelList = dayList,
                 imageFn = { _, _ -> "" },

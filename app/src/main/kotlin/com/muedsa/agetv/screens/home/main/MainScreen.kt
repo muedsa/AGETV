@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.MaterialTheme
@@ -115,6 +116,7 @@ fun MainScreen(
                                     .height(screenHeight - firstRowHeight - tabHeight)
                             )
                             ImageCardsRow(
+                                modifier = Modifier.testTag("mainScreen_row_1"),
                                 title = "最近更新",
                                 modelList = latestList,
                                 imageFn = { _, item ->
@@ -142,6 +144,7 @@ fun MainScreen(
                 // 每日推荐
                 item {
                     StandardImageCardsRow(
+                        modifier = Modifier.testTag("mainScreen_row_2"),
                         title = "每日推荐",
                         modelList = recommendList,
                         imageFn = { _, item ->

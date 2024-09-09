@@ -8,7 +8,6 @@ import com.muedsa.agetv.KEY_DANMAKU_ENABLE
 import com.muedsa.agetv.KEY_DANMAKU_MERGE_ENABLE
 import com.muedsa.agetv.KEY_DANMAKU_SCREEN_PART
 import com.muedsa.agetv.KEY_DANMAKU_SIZE_SCALE
-import com.muedsa.agetv.KEY_UPSCAYL_COVER_IMAGE_ENABLE
 import com.muedsa.agetv.model.AppSettingModel
 import com.muedsa.agetv.model.LazyData
 import com.muedsa.agetv.repository.DataStoreRepo
@@ -86,14 +85,6 @@ class AppSettingViewModel @Inject constructor(
                 repo.dataStore.edit {
                     it[KEY_DANMAKU_SCREEN_PART] = value
                 }
-            }
-        }
-    }
-
-    fun changeUpscaylCoverImageEnable(enable: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repo.dataStore.edit {
-                it[KEY_UPSCAYL_COVER_IMAGE_ENABLE] = enable
             }
         }
     }

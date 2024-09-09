@@ -10,12 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.MaterialTheme
@@ -65,24 +62,11 @@ fun RecommendScreen(
 
             if (!recommendLD.data.isNullOrEmpty()) {
                 val recommendList = recommendLD.data!!
-                val gridFocusRequester = remember { FocusRequester() }
 
                 LazyVerticalGrid(
                     modifier = Modifier
-                        .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp)
-                        .focusRequester(gridFocusRequester)
-                        .focusProperties {
-                            exit = { gridFocusRequester.saveFocusedChild(); FocusRequester.Default }
-                            enter = {
-                                if (gridFocusRequester.restoreFocusedChild()) {
-                                    LogUtil.d("grid restoreFocusedChild")
-                                    FocusRequester.Cancel
-                                } else {
-                                    LogUtil.d("grid focused default child")
-                                    FocusRequester.Default
-                                }
-                            }
-                        },
+                        .testTag("recommendScreen_grid")
+                        .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp),
                     columns = GridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
                     contentPadding = PaddingValues(
                         top = ImageCardRowCardPadding,
