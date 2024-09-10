@@ -23,12 +23,12 @@ if (keystorePropertiesFile.exists() && keystorePropertiesFile.canRead()) {
 
 android {
     namespace = "com.muedsa.agetv"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.muedsa.agetv"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 7
         versionName = "1.0.0-rc01"
     }
