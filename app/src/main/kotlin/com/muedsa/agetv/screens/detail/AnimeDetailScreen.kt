@@ -54,7 +54,7 @@ import com.muedsa.agetv.PlaybackActivity
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.room.model.FavoriteAnimeModel
 import com.muedsa.agetv.screens.NavigationItems
-import com.muedsa.agetv.screens.navigate
+import com.muedsa.agetv.screens.nav
 import com.muedsa.agetv.theme.AgePosterSize
 import com.muedsa.agetv.theme.FavoriteIconColor
 import com.muedsa.agetv.theme.RankFontColor
@@ -369,7 +369,7 @@ fun AnimeDetailScreen(
                         Spacer(modifier = Modifier.width(25.dp))
                         OutlinedButton(
                             onClick = {
-                                navController.navigate(NavigationItems.Setting, null)
+                                navController.nav(NavigationItems.Setting)
                             }
                         ) {
                             Text(text = "设置")

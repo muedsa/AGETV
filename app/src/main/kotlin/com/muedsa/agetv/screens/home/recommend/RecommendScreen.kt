@@ -20,7 +20,7 @@ import androidx.tv.material3.Text
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.screens.NavigationItems
 import com.muedsa.agetv.screens.home.useLocalHomeScreenBackgroundState
-import com.muedsa.agetv.screens.navigate
+import com.muedsa.agetv.screens.nav
 import com.muedsa.agetv.theme.AgePosterSize
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
@@ -92,7 +92,7 @@ fun RecommendScreen(
                             },
                             onItemClick = {
                                 LogUtil.d("Click $item")
-                                navController.navigate(
+                                navController.nav(
                                     NavigationItems.Detail,
                                     listOf(item.aid.toString())
                                 )

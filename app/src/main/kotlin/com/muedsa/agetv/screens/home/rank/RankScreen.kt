@@ -33,7 +33,7 @@ import androidx.tv.material3.WideButtonDefaults
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.model.age.AgeCatalogOption
 import com.muedsa.agetv.screens.NavigationItems
-import com.muedsa.agetv.screens.navigate
+import com.muedsa.agetv.screens.nav
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
 import com.muedsa.compose.tv.useLocalNavHostController
 import com.muedsa.compose.tv.useLocalRightSideDrawerController
@@ -134,7 +134,7 @@ fun RankScreen(
                                 model = it,
                                 onClick = {
                                     LogUtil.d("Click $it")
-                                    navController.navigate(
+                                    navController.nav(
                                         NavigationItems.Detail,
                                         listOf(it.aid.toString())
                                     )
@@ -165,7 +165,7 @@ fun RankScreen(
                                 model = it,
                                 onClick = {
                                     LogUtil.d("Click $it")
-                                    navController.navigate(
+                                    navController.nav(
                                         NavigationItems.Detail,
                                         listOf(it.aid.toString())
                                     )
@@ -197,7 +197,7 @@ fun RankScreen(
                                 model = it,
                                 onClick = {
                                     LogUtil.d("Click $it")
-                                    navController.navigate(
+                                    navController.nav(
                                         NavigationItems.Detail,
                                         listOf(it.aid.toString())
                                     )

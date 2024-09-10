@@ -30,7 +30,7 @@ import androidx.tv.material3.Text
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.screens.NavigationItems
 import com.muedsa.agetv.screens.home.useLocalHomeScreenBackgroundState
-import com.muedsa.agetv.screens.navigate
+import com.muedsa.agetv.screens.nav
 import com.muedsa.agetv.theme.AgePosterSize
 import com.muedsa.agetv.theme.GirdLastItemHeight
 import com.muedsa.compose.tv.model.ContentModel
@@ -101,7 +101,7 @@ fun LatestUpdateScreen(
                     },
                     onItemClick = {
                         LogUtil.d("Click $item")
-                        navController.navigate(NavigationItems.Detail, listOf(item.aid.toString()))
+                        navController.nav(NavigationItems.Detail, listOf(item.aid.toString()))
                     }
                 )
 
