@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -34,8 +33,6 @@ import com.muedsa.compose.tv.widget.LoadingScreen
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.uitl.LogUtil
 
-
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun RecommendScreen(
     viewModel: RecommendViewModel = hiltViewModel()
