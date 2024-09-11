@@ -54,7 +54,8 @@ fun RightSideDrawer(
                                 Box(
                                     Modifier
                                         .fillMaxHeight()
-                                        .padding(all = 20.dp)) {
+                                        .padding(all = 20.dp)
+                                ) {
                                     controller.ContentCompose()
                                 }
                             }

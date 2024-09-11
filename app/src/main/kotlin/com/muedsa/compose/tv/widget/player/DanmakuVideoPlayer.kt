@@ -226,6 +226,7 @@ fun DanmakuItemData.copyWith(
         userId = userId ?: this.userId,
         mergedType = mergedType ?: this.mergedType
     )
+
 private fun processContent(content: String): String {
     if (content.isBlank()) {
         return ""
