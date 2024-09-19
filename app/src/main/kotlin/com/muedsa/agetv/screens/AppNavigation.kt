@@ -90,9 +90,9 @@ fun buildRoute(
     return route
 }
 
-fun NavHostController.navigate(
+fun NavHostController.nav(
     navItem: NavigationItems,
-    pathParams: List<String>?
+    pathParams: List<String>? = null
 ) {
     navigate(buildRoute(navItem, pathParams))
 }

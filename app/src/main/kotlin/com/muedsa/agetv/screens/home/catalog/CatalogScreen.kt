@@ -29,11 +29,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.ButtonDefaults
@@ -46,7 +45,7 @@ import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.model.age.AgeCatalogOption
 import com.muedsa.agetv.screens.NavigationItems
 import com.muedsa.agetv.screens.home.useLocalHomeScreenBackgroundState
-import com.muedsa.agetv.screens.navigate
+import com.muedsa.agetv.screens.nav
 import com.muedsa.agetv.theme.AgePosterSize
 import com.muedsa.agetv.theme.GirdLastItemHeight
 import com.muedsa.compose.tv.model.ContentModel
@@ -59,7 +58,6 @@ import com.muedsa.compose.tv.widget.ImageContentCard
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.uitl.LogUtil
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CatalogScreen(
     viewModel: CatalogViewModel = hiltViewModel()
@@ -88,6 +86,7 @@ fun CatalogScreen(
     Column(modifier = Modifier.padding(start = ScreenPaddingLeft)) {
         Row(
             modifier = Modifier
+                .testTag("catalogScreen_options")
                 .fillMaxWidth()
                 .offset(x = -ScreenPaddingLeft)
                 .padding(vertical = 30.dp),
@@ -242,7 +241,6 @@ fun CatalogScreen(
                 }
             }
         } else {
-            val gridFocusRequester = remember { FocusRequester() }
 
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
@@ -250,20 +248,7 @@ fun CatalogScreen(
                     top = ImageCardRowCardPadding,
                     bottom = ImageCardRowCardPadding
                 ),
-                modifier = Modifier
-                    .focusRequester(gridFocusRequester)
-                    .focusProperties {
-                        exit = { gridFocusRequester.saveFocusedChild(); FocusRequester.Default }
-                        enter = {
-                            if (gridFocusRequester.restoreFocusedChild()) {
-                                LogUtil.d("grid restoreFocusedChild")
-                                FocusRequester.Cancel
-                            } else {
-                                LogUtil.d("grid focused default child")
-                                FocusRequester.Default
-                            }
-                        }
-                    }
+                modifier = Modifier.testTag("catalogScreen_grid")
             ) {
                 itemsIndexed(
                     items = searchAnimeLP.list,
@@ -290,7 +275,7 @@ fun CatalogScreen(
                         },
                         onItemClick = {
                             LogUtil.d("Click $item")
-                            navController.navigate(
+                            navController.nav(
                                 NavigationItems.Detail,
                                 listOf(item.id.toString())
                             )

@@ -1,4 +1,3 @@
-
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -12,6 +11,7 @@ plugins {
     alias(libs.plugins.firebaseCrashlytics)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.androidRoom)
+    alias(libs.plugins.baselineProfile)
 }
 
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
@@ -22,14 +22,14 @@ if (keystorePropertiesFile.exists() && keystorePropertiesFile.canRead()) {
 
 android {
     namespace = "com.muedsa.agetv"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.muedsa.agetv"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 6
-        versionName = "0.0.1-alpha06"
+        targetSdk = 35
+        versionCode = 7
+        versionName = "1.0.0-rc01"
     }
 
     signingConfigs {
@@ -109,6 +109,8 @@ dependencies {
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.hilt.android)
+    implementation(libs.profile.installer)
+    "baselineProfile"(project(":benchmark"))
     ksp(libs.hilt.compiler)
     implementation(libs.activity.compose)
     implementation(platform(libs.compose.bom))

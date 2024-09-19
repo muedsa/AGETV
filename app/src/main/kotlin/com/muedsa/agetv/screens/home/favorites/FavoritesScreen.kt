@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.ButtonDefaults
@@ -32,7 +33,7 @@ import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.Text
 import com.muedsa.agetv.screens.NavigationItems
 import com.muedsa.agetv.screens.home.useLocalHomeScreenBackgroundState
-import com.muedsa.agetv.screens.navigate
+import com.muedsa.agetv.screens.nav
 import com.muedsa.agetv.theme.AgePosterSize
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
@@ -69,9 +70,10 @@ fun FavoritesScreen(
                 style = MaterialTheme.typography.headlineMedium
             )
             Spacer(modifier = Modifier.width(30.dp))
-            OutlinedButton(onClick = {
-                deleteMode = !deleteMode
-            }) {
+            OutlinedButton(
+                modifier = Modifier.testTag("favoritesScreen_deleteModeButton"),
+                onClick = { deleteMode = !deleteMode }
+            ) {
                 Text(if (deleteMode) "退出" else "删除模式")
                 Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
                 Icon(
@@ -83,6 +85,7 @@ fun FavoritesScreen(
 
         LazyVerticalGrid(
             modifier = Modifier
+                .testTag("favoritesScreen_grid")
                 .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp),
             columns = GridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
             contentPadding = PaddingValues(
@@ -117,7 +120,7 @@ fun FavoritesScreen(
                             }
                             viewModel.remove(item)
                         } else {
-                            navController.navigate(
+                            navController.nav(
                                 NavigationItems.Detail,
                                 listOf(item.id.toString())
                             )

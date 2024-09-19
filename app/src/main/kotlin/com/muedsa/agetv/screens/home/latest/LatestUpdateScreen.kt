@@ -17,11 +17,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.Card
@@ -30,7 +29,7 @@ import androidx.tv.material3.Text
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.screens.NavigationItems
 import com.muedsa.agetv.screens.home.useLocalHomeScreenBackgroundState
-import com.muedsa.agetv.screens.navigate
+import com.muedsa.agetv.screens.nav
 import com.muedsa.agetv.theme.AgePosterSize
 import com.muedsa.agetv.theme.GirdLastItemHeight
 import com.muedsa.compose.tv.model.ContentModel
@@ -43,7 +42,6 @@ import com.muedsa.compose.tv.widget.ImageContentCard
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.uitl.LogUtil
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LatestUpdateScreen(
     viewModel: LatestUpdateViewModel = hiltViewModel()
@@ -53,8 +51,6 @@ fun LatestUpdateScreen(
     val toastController = useLocalToastMsgBoxController()
 
     val latestUpdateLP by viewModel.latestUpdateLPSF.collectAsState()
-
-    val gridFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(key1 = latestUpdateLP) {
         if (latestUpdateLP.type == LazyType.FAILURE) {
@@ -71,20 +67,8 @@ fun LatestUpdateScreen(
 
         LazyVerticalGrid(
             modifier = Modifier
-                .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp)
-                .focusRequester(gridFocusRequester)
-                .focusProperties {
-                    exit = { gridFocusRequester.saveFocusedChild(); FocusRequester.Default }
-                    enter = {
-                        if (gridFocusRequester.restoreFocusedChild()) {
-                            LogUtil.d("grid restoreFocusedChild")
-                            FocusRequester.Cancel
-                        } else {
-                            LogUtil.d("grid focused default child")
-                            FocusRequester.Default
-                        }
-                    }
-                },
+                .testTag("latestUpdateScreen_grid")
+                .padding(start = 0.dp, top = 20.dp, end = 20.dp, bottom = 20.dp),
             columns = GridCells.Adaptive(AgePosterSize.width + ImageCardRowCardPadding),
             contentPadding = PaddingValues(
                 top = ImageCardRowCardPadding,
@@ -115,7 +99,7 @@ fun LatestUpdateScreen(
                     },
                     onItemClick = {
                         LogUtil.d("Click $item")
-                        navController.navigate(NavigationItems.Detail, listOf(item.aid.toString()))
+                        navController.nav(NavigationItems.Detail, listOf(item.aid.toString()))
                     }
                 )
 

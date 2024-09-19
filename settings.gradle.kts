@@ -17,4 +17,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AGETV"
 include(":app")
- 
+include(":benchmark")

@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,7 +33,7 @@ import androidx.tv.material3.WideButtonDefaults
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.model.age.AgeCatalogOption
 import com.muedsa.agetv.screens.NavigationItems
-import com.muedsa.agetv.screens.navigate
+import com.muedsa.agetv.screens.nav
 import com.muedsa.compose.tv.theme.ScreenPaddingLeft
 import com.muedsa.compose.tv.useLocalNavHostController
 import com.muedsa.compose.tv.useLocalRightSideDrawerController
@@ -127,13 +128,13 @@ fun RankScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleLarge
                     )
-                    LazyColumn {
+                    LazyColumn(modifier = Modifier.testTag("rankScreen_col_week")) {
                         items(dayList) {
                             RankAnimeWidget(
                                 model = it,
                                 onClick = {
                                     LogUtil.d("Click $it")
-                                    navController.navigate(
+                                    navController.nav(
                                         NavigationItems.Detail,
                                         listOf(it.aid.toString())
                                     )
@@ -158,13 +159,13 @@ fun RankScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleLarge
                     )
-                    LazyColumn {
+                    LazyColumn(modifier = Modifier.testTag("rankScreen_col_month")) {
                         items(weekList) {
                             RankAnimeWidget(
                                 model = it,
                                 onClick = {
                                     LogUtil.d("Click $it")
-                                    navController.navigate(
+                                    navController.nav(
                                         NavigationItems.Detail,
                                         listOf(it.aid.toString())
                                     )
@@ -190,13 +191,13 @@ fun RankScreen(
                         style = MaterialTheme.typography.titleLarge
                     )
 
-                    LazyColumn {
+                    LazyColumn(modifier = Modifier.testTag("rankScreen_col_all")) {
                         items(totalList) {
                             RankAnimeWidget(
                                 model = it,
                                 onClick = {
                                     LogUtil.d("Click $it")
-                                    navController.navigate(
+                                    navController.nav(
                                         NavigationItems.Detail,
                                         listOf(it.aid.toString())
                                     )

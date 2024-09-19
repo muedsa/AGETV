@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.MaterialTheme
@@ -28,7 +29,7 @@ import com.muedsa.agetv.BuildConfig
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.screens.NavigationItems
 import com.muedsa.agetv.screens.home.useLocalHomeScreenBackgroundState
-import com.muedsa.agetv.screens.navigate
+import com.muedsa.agetv.screens.nav
 import com.muedsa.agetv.theme.AgePosterSize
 import com.muedsa.compose.tv.model.ContentModel
 import com.muedsa.compose.tv.theme.ImageCardRowCardPadding
@@ -115,6 +116,7 @@ fun MainScreen(
                                     .height(screenHeight - firstRowHeight - tabHeight)
                             )
                             ImageCardsRow(
+                                modifier = Modifier.testTag("mainScreen_row_1"),
                                 title = "最近更新",
                                 modelList = latestList,
                                 imageFn = { _, item ->
@@ -129,7 +131,7 @@ fun MainScreen(
                                 },
                                 onItemClick = { _, anime ->
                                     LogUtil.d("Click $anime")
-                                    navController.navigate(
+                                    navController.nav(
                                         NavigationItems.Detail,
                                         listOf(anime.aid.toString())
                                     )
@@ -142,6 +144,7 @@ fun MainScreen(
                 // 每日推荐
                 item {
                     StandardImageCardsRow(
+                        modifier = Modifier.testTag("mainScreen_row_2"),
                         title = "每日推荐",
                         modelList = recommendList,
                         imageFn = { _, item ->
@@ -159,7 +162,7 @@ fun MainScreen(
                         },
                         onItemClick = { _, anime ->
                             LogUtil.d("Click $anime")
-                            navController.navigate(
+                            navController.nav(
                                 NavigationItems.Detail,
                                 listOf(anime.aid.toString())
                             )
@@ -171,7 +174,7 @@ fun MainScreen(
                 item {
                     WeekAnimeListWidget(model = weekList) { _, _, item ->
                         LogUtil.d("Click $item")
-                        navController.navigate(NavigationItems.Detail, listOf(item.id.toString()))
+                        navController.nav(NavigationItems.Detail, listOf(item.id.toString()))
                     }
                 }
 
