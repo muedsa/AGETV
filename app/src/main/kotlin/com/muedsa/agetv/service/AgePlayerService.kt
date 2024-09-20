@@ -4,7 +4,6 @@ import com.google.common.net.HttpHeaders
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.muedsa.agetv.AgeMobileUrl
 import com.muedsa.agetv.AgeMobileUrlBase64
-import com.muedsa.agetv.BuildConfig
 import com.muedsa.agetv.model.AgePlayInfoModel
 import com.muedsa.uitl.ChromeUserAgent
 import com.muedsa.uitl.LenientJson
@@ -24,7 +23,9 @@ import java.net.URLDecoder
 import java.util.UUID
 
 
-class AgePlayerService {
+class AgePlayerService(
+    val debug: Boolean
+) {
 
     suspend fun getPlayInfo(url: String): AgePlayInfoModel {
         val doc = fetchGet(url)
@@ -156,7 +157,7 @@ class AgePlayerService {
                             .header(HttpHeaders.REFERER, AgeMobileUrl).build()
                     )
                 }.also {
-                    if (BuildConfig.DEBUG) {
+                    if (debug) {
                         val loggingInterceptor = HttpLoggingInterceptor()
                         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
                         it.addInterceptor(loggingInterceptor)
@@ -180,7 +181,7 @@ class AgePlayerService {
                             .header(HttpHeaders.REFERER, AgeMobileUrl).build()
                     )
                 }.also {
-                    if (BuildConfig.DEBUG) {
+                    if (debug) {
                         val loggingInterceptor = HttpLoggingInterceptor()
                         loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
                         it.addInterceptor(loggingInterceptor)

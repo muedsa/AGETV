@@ -15,7 +15,7 @@ class AgePlayerServiceTest {
         Security.addProvider(BouncyCastleProvider())
     }
 
-    private val service = AgePlayerService()
+    private val service = AgePlayerService(true)
 
 //    @Test
 //    fun getPlayInfoTest() {

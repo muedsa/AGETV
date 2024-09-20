@@ -20,12 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.muedsa.agetv.BuildConfig
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.agetv.screens.NavigationItems
 import com.muedsa.agetv.screens.home.useLocalHomeScreenBackgroundState
@@ -44,6 +44,7 @@ import com.muedsa.compose.tv.widget.ImmersiveList
 import com.muedsa.compose.tv.widget.LoadingScreen
 import com.muedsa.compose.tv.widget.ScreenBackgroundType
 import com.muedsa.compose.tv.widget.StandardImageCardsRow
+import com.muedsa.uitl.AppUtil
 import com.muedsa.uitl.LogUtil
 
 @Composable
@@ -56,6 +57,7 @@ fun MainScreen(
     val backgroundState = useLocalHomeScreenBackgroundState()
     val toastController = useLocalToastMsgBoxController()
     val navController = useLocalNavHostController()
+    val context = LocalContext.current
 
     val homeData by viewModel.homeDataSF.collectAsState()
 
@@ -189,7 +191,12 @@ fun MainScreen(
                                 .padding(top = 16.dp)
                                 .align(Alignment.CenterEnd)
                                 .graphicsLayer { alpha = 0.6f },
-                            text = "APP版本: ${BuildConfig.BUILD_TYPE}-${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})",
+                            text = "APP版本: ${AppUtil.getVersionInfo(context)}${
+                                if (AppUtil.debuggable(
+                                        context
+                                    )
+                                ) " DEBUG" else ""
+                            }",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.labelSmall
                         )

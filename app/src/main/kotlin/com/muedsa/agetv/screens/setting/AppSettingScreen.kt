@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,16 +30,17 @@ import androidx.tv.material3.OutlinedIconButton
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
-import com.muedsa.agetv.BuildConfig
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.compose.tv.theme.surfaceContainer
 import com.muedsa.compose.tv.useLocalToastMsgBoxController
 import com.muedsa.compose.tv.widget.FocusScaleSwitch
+import com.muedsa.uitl.AppUtil
 
 @Composable
 fun AppSettingScreen(
     viewModel: AppSettingViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val toastController = useLocalToastMsgBoxController()
     val settingLD by viewModel.settingLDSF.collectAsState()
 
@@ -241,7 +243,7 @@ fun AppSettingScreen(
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})",
+                            text = AppUtil.getVersionInfo(context),
                             color = MaterialTheme.colorScheme.onBackground,
                             style = MaterialTheme.typography.titleMedium
                         )

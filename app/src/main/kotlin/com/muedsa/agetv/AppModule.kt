@@ -1,16 +1,19 @@
 package com.muedsa.agetv
 
+import android.content.Context
 import com.google.common.net.HttpHeaders
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.muedsa.agetv.repository.AppRepository
 import com.muedsa.agetv.service.AgeApiService
 import com.muedsa.agetv.service.AgePlayerService
 import com.muedsa.agetv.service.DanDanPlayApiService
+import com.muedsa.uitl.AppUtil
 import com.muedsa.uitl.ChromeUserAgent
 import com.muedsa.uitl.LenientJson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -24,7 +27,7 @@ internal object AppModule {
 
     @Provides
     @Singleton
-    fun provideAgeApiService(): AgeApiService {
+    fun provideAgeApiService(@ApplicationContext context: Context): AgeApiService {
         val client = OkHttpClient.Builder()
             .addInterceptor {
                 it.proceed(
@@ -35,7 +38,7 @@ internal object AppModule {
                 )
             }
             .also {
-                if (BuildConfig.DEBUG) {
+                if (AppUtil.debuggable(context)) {
                     val loggingInterceptor = HttpLoggingInterceptor()
                     loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
                     it.addInterceptor(loggingInterceptor)
@@ -53,14 +56,15 @@ internal object AppModule {
 
     @Provides
     @Singleton
-    fun provideAgePlayerService() = AgePlayerService()
+    fun provideAgePlayerService(@ApplicationContext context: Context) =
+        AgePlayerService(AppUtil.debuggable(context))
 
     @Provides
     @Singleton
-    fun provideDanDanPlayApiService(): DanDanPlayApiService {
+    fun provideDanDanPlayApiService(@ApplicationContext context: Context): DanDanPlayApiService {
         val client = OkHttpClient.Builder()
             .also {
-                if (BuildConfig.DEBUG) {
+                if (AppUtil.debuggable(context)) {
                     val loggingInterceptor = HttpLoggingInterceptor()
                     loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
                     it.addInterceptor(loggingInterceptor)

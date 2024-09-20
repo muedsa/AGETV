@@ -20,7 +20,6 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import com.kuaishou.akdanmaku.ecs.component.filter.DuplicateMergedFilter
-import com.muedsa.agetv.BuildConfig
 import com.muedsa.agetv.model.LazyType
 import com.muedsa.compose.tv.useLocalToastMsgBoxController
 import com.muedsa.compose.tv.widget.player.DanmakuVideoPlayer
@@ -123,7 +122,6 @@ fun PlaybackScreen(
         val danmakuSetting = danmakuSettingLD.data!!
 
         DanmakuVideoPlayer(
-            debug = BuildConfig.DEBUG,
             danmakuConfigSetting = {
                 textSizeScale = danmakuSetting.danmakuSizeScale / 100f
                 alpha = danmakuSetting.danmakuAlpha / 100f
