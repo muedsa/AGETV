@@ -113,17 +113,17 @@ fun AnimeDetailScreen(
         }
     }
 
-    LaunchedEffect(key1 = danSearchAnimeListLD) {
-        if (danSearchAnimeListLD.type == LazyType.FAILURE) {
-            toastController.error(danSearchAnimeListLD.error)
-        }
-    }
-
-    LaunchedEffect(key1 = danAnimeInfoLD) {
-        if (danAnimeInfoLD.type == LazyType.FAILURE) {
-            toastController.error(danAnimeInfoLD.error)
-        }
-    }
+//    LaunchedEffect(key1 = danSearchAnimeListLD) {
+//        if (danSearchAnimeListLD.type == LazyType.FAILURE) {
+//            toastController.error(danSearchAnimeListLD.error)
+//        }
+//    }
+//
+//    LaunchedEffect(key1 = danAnimeInfoLD) {
+//        if (danAnimeInfoLD.type == LazyType.FAILURE) {
+//            toastController.error(danAnimeInfoLD.error)
+//        }
+//    }
 
     DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
