@@ -1,3 +1,5 @@
+## 项目基本不再更新, 请使用 [TvBox](https://github.com/muedsa/TvBox) + [AgeTvPlugin](https://github.com/muedsa/AgeTvPlugin)
+
 <div align="center">
   <img src="app/src/main/ic_launcher-playstore.png" width="128px" height="128px"/>
   <h1>AGETV</h1>
