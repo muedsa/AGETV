@@ -28,8 +28,8 @@ android {
         applicationId = "com.muedsa.agetv"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.0.0-rc01"
+        versionCode = 8
+        versionName = "1.0.0"
     }
 
     signingConfigs {
